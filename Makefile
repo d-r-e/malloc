@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic
+CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic -DDEBUG -g
 CC = gcc
 SRC = src/malloc.c
 INC = inc
@@ -34,7 +34,14 @@ clean:
 
 test: $(LIBRARY)
 	$(CC) $(CFLAGS) -o test.out test/main.c -lft -L libft -I $(INC) -L . -lmalloc
-	LD_LIBRARY_PATH=. valgrind --leak-check=full ./test.out
+	@ulimit -n 4096
+	LD_LIBRARY_PATH=. valgrind -s --leak-check=full ./test.out
+	rm -f test.out
+
+x: $(LIBRARY)
+	$(CC) $(CFLAGS) -o test.out test/main.c -lft -L libft -I $(INC) -L . -lmalloc
+	@ulimit -n 4096
+	LD_LIBRARY_PATH=. ./test.out
 	rm -f test.out
 
 fclean: clean

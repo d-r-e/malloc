@@ -5,49 +5,111 @@
 #define RED "\033[31m"
 #define RESET "\033[0m"
 
-void test_malloc()
+void test_ft_malloc()
 {
-    printf("Testing malloc...\n");
-    void *ptr = malloc(10);
+    printf("Testing ft_malloc...\n");
+    void *ptr = ft_malloc(10);
     if (ptr != NULL)
     {
-        printf(GREEN "[ ✔ ]" RESET " malloc succeeded\n");
+        for (int i = 0; i < 10; i++)
+        {
+            ((char *)ptr)[i] = 'B';
+        }
+        printf(GREEN "[ ✔ ]" RESET " ft_malloc succeeded\n");
     }
     else
     {
-        printf(RED "[ ✘ ]" RESET " malloc failed\n");
+        printf(RED "[ ✘ ]" RESET " ft_malloc failed\n");
     }
-    free(ptr);
+    ft_free(ptr);
 }
 
-void test_free()
+void test_ft_free()
 {
-    printf("Testing free...\n");
-    void *ptr = malloc(10);
-    free(ptr);
-    printf(GREEN "[ ✔ ]" RESET " free succeeded\n");
+    printf("Testing ft_free...\n");
+    void *ptr = ft_malloc(10);
+    ft_free(ptr);
+    printf(GREEN "[ ✔ ]" RESET " ft_free succeeded\n");
 }
 
-void test_realloc()
+void test_ft_realloc()
 {
-    printf("Testing realloc...\n");
-    void *ptr = malloc(10);
-    ptr = realloc(ptr, 20);
+    printf("Testing ft_realloc...\n");
+    void *ptr = ft_malloc(10);
+    ptr = ft_realloc(ptr, 20);
     if (ptr != NULL)
     {
-        printf(GREEN "[ ✔ ]" RESET " realloc succeeded\n");
+        printf(GREEN "[ ✔ ]" RESET " ft_realloc succeeded\n");
     }
     else
     {
-        printf(RED "[ ✘ ]" RESET " realloc failed\n");
+        printf(RED "[ ✘ ]" RESET " ft_realloc failed\n");
     }
-    free(ptr);
+    ft_free(ptr);
+}
+
+#include <stdio.h>
+#include <ft_malloc.h>
+
+#define GREEN "\033[32m"
+#define RED "\033[31m"
+#define RESET "\033[0m"
+
+void test_ft_malloc_zero_size()
+{
+    printf("Testing ft_malloc with zero size...\n");
+    void *ptr = ft_malloc(0);
+    ft_free(ptr);
+    printf(GREEN "[ ✔ ]" RESET " ft_malloc with zero size succeeded\n");
+}
+
+void test_ft_free_null()
+{
+    printf("Testing ft_free with NULL pointer...\n");
+    ft_free(NULL); // Should not crash
+    printf(GREEN "[ ✔ ]" RESET " ft_free with NULL succeeded\n");
+}
+
+void test_ft_realloc_smaller()
+{
+    printf("Testing ft_realloc with smaller size...\n");
+    void *ptr = ft_malloc(20);
+    ptr = ft_realloc(ptr, 10);
+    if (ptr != NULL)
+    {
+        printf(GREEN "[ ✔ ]" RESET " ft_realloc with smaller size succeeded\n");
+    }
+    else
+    {
+        printf(RED "[ ✘ ]" RESET " ft_realloc with smaller size failed\n");
+    }
+    ft_free(ptr);
+}
+
+
+void test_ft_realloc_null()
+{
+    printf("Testing ft_realloc with NULL pointer...\n");
+    void *ptr = ft_realloc(NULL, 10);
+    if (ptr != NULL) // Depending on the implementation, you might expect this to act like malloc
+    {
+        printf(GREEN "[ ✔ ]" RESET " ft_realloc with NULL pointer succeeded\n");
+    }
+    else
+    {
+        printf(RED "[ ✘ ]" RESET " ft_realloc with NULL pointer failed\n");
+    }
+    ft_free(ptr);
 }
 
 int main()
 {
-    // test_malloc();
-    // test_free();
-    // test_realloc();
+    test_ft_malloc();
+    test_ft_malloc_zero_size();
+    // test_ft_free();
+    // test_ft_free_null();
+    // test_ft_realloc();
+    // test_ft_realloc_smaller();
+    // test_ft_realloc_null();
     return 0;
 }
