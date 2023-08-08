@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/resource.h>
+#include <libft.h>
 
 void *ft_malloc(size_t size);
 void ft_free(void *ptr);

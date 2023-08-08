@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic -DDEBUG -g
+CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic -g
 CC = gcc
 SRC = src/malloc.c
 INC = inc
@@ -21,8 +21,8 @@ $(NAME): $(LIBRARY)
 $(LIBRARY): $(OBJ) $(LIBFT)
 	@$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
 
-$(OBJ): $(SRC) $(LIBFT)
-	@$(CC) $(CFLAGS) -c $(SRC) -l $(LIBFT) -L libft -I $(INC) -fPIC -o $(OBJ)
+$(OBJ): Makefile $(SRC) $(LIBFT)
+	@$(CC) $(CFLAGS) -c $(SRC) -I libft  -L libft -lft -I $(INC) -fPIC -o $(OBJ)
 
 $(LIBFT):
 	@make -C libft
@@ -33,16 +33,16 @@ clean:
 	rm -f $(OBJ)
 
 test: $(LIBRARY)
-	$(CC) $(CFLAGS) -o test.out test/main.c -lft -L libft -I $(INC) -L . -lmalloc
+	$(CC) $(CFLAGS) -o test.out test/main.c -I $(INC)   -L libft -lft -L . -lmalloc
 	@ulimit -n 4096
 	LD_LIBRARY_PATH=. valgrind -s --leak-check=full ./test.out
 	rm -f test.out
 
 x: $(LIBRARY)
-	$(CC) $(CFLAGS) -o test.out test/main.c -lft -L libft -I $(INC) -L . -lmalloc
+	$(CC) $(CFLAGS) -o test.out test/main.c -I libft -L libft -lft  -I $(INC) -L . -lmalloc
 	@ulimit -n 4096
-	LD_LIBRARY_PATH=. ./test.out
-	rm -f test.out
+	@LD_LIBRARY_PATH=. ./test.out
+	@rm -f test.out
 
 fclean: clean
 	make -C libft fclean
