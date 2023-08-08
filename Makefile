@@ -38,7 +38,7 @@ test: $(LIBRARY)
 	LD_LIBRARY_PATH=. valgrind -s --leak-check=full ./test.out
 	rm -f test.out
 
-x: $(LIBRARY)
+x: all
 	$(CC) $(CFLAGS) -o test.out test/main.c -I libft -L libft -lft  -I $(INC) -L . -lmalloc
 	@ulimit -n 4096
 	@LD_LIBRARY_PATH=. ./test.out
