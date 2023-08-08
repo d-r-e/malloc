@@ -1,0 +1,6 @@
+# c files
+*/*.o
+*.so
+*.a
+.vscode
+.devcontainer
