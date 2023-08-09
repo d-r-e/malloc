@@ -4,4 +4,4 @@
 *.a
 .vscode
 .devcontainer
-*.out
+*.pdf

@@ -1,11 +1,73 @@
 #include <ft_malloc.h>
-#include <stdlib.h>
+
+t_block *g_head = NULL;
+
+/***
+ * show_alloc_mem
+ * This function is used to print the memory allocation of the preallocated blocks.
+*/
+void show_alloc_mem(){
+	t_block *tmp = NULL;
+
+	tmp = g_head;
+	printf("TINY : %p\n", (void*)tmp);
+	while (tmp != NULL)
+	{
+		if (tmp->size == TINY)
+		{
+			printf("%p - %p : %lu bytes\n", (void*)(tmp + sizeof(t_block)), (void*)(tmp + sizeof(t_block) + TINY), tmp->size);
+		} else if (tmp->size == SMALL)
+		{
+			printf("%p - %p : %lu bytes\n", (void*)(tmp + sizeof(t_block)), (void*)(tmp + sizeof(t_block) + SMALL), tmp->size);
+		} else if (tmp->size == LARGE)
+		{
+			printf("%p - %p : %lu bytes\n", (void*)(tmp + sizeof(t_block)), (void*)(tmp + sizeof(t_block) + LARGE), tmp->size);
+		}
+		tmp = tmp->next;
+
+	}
+
+	
+}
+
+/***
+ * prealloc
+ * For the three predefined sizes, TINY, SMALL and LARGE, we preallocate 100 blocks of each size.
+*/
+static int prealloc(void)
+{
+	int i;
+	t_block *tmp = NULL;
+
+	if (g_head != NULL)
+		return 0;
+
+	// TINY
+	g_head = mmap(NULL, (sizeof(t_block) + TINY) * 100, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (g_head == MAP_FAILED)
+		return -1;
+	tmp = g_head;
+	for (i = 0; i < 3; i++)
+	{
+		tmp->size = TINY;
+		tmp->inuse = false;
+		tmp->next = (t_block *)(tmp + sizeof(t_block) + TINY);
+		tmp->prev = i > 0 ? (t_block *)(tmp - sizeof(t_block) - TINY) : NULL;
+		if (i == 2)
+			tmp->next = NULL;
+		tmp = tmp->next;
+	}
+	show_alloc_mem();
+	return 0;
+}
 
 void *ft_malloc(size_t size)
 {
 	void *ptr = NULL;
 	int page_size = getpagesize();
 	struct rlimit limit;
+
+	prealloc();
 
 // printf("page size: %d\n", page_size);
 	getrlimit(RLIMIT_AS, &limit);
