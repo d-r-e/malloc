@@ -13,7 +13,7 @@
 #define SMALL 1024
 #define LARGE 4096 * 4
 
-#define N_BLOCKS getpagesize() / TINY // 128
+#define N_BLOCKS getpagesize() / TINY
 
 /* TYPES AND STRUCTS */
 

@@ -1,6 +1,6 @@
 CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic -g
 CC = gcc
-SRC = src/malloc.c src/output.c
+SRC = src/malloc.c src/output.c src/free.c
 INC = inc
 HEADER = inc/ft_malloc.h
 OBJ = $(SRC:.c=.o)

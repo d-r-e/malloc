@@ -119,10 +119,6 @@ void *malloc(size_t size) {
     return NULL;
 }
 
-void free(void *ptr) {
-    (void) ptr;
-    // free(ptr);
-}
 
 void *ft_realloc(void *ptr, size_t size) {
     return realloc(ptr, size);
