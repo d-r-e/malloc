@@ -5,9 +5,9 @@
 #define RED "\033[31m"
 #define RESET "\033[0m"
 
-void test_ft_malloc()
+void test_malloc()
 {
-    void *ptr = ft_malloc(10);
+    void *ptr = malloc(10);
     if (ptr != NULL)
     {
         for (int i = 0; i < 10; i++)
@@ -20,19 +20,19 @@ void test_ft_malloc()
     {
         printf(RED "[ ✘ ]" RESET);
     }
-    ft_free(ptr);
+    free(ptr);
 }
 
-void test_ft_free()
+void test_free()
 {
-    void *ptr = ft_malloc(10);
-    ft_free(ptr);
+    void *ptr = malloc(10);
+    free(ptr);
     printf(GREEN "[ ✔ ]" RESET );
 }
 
 void test_ft_realloc()
 {
-    void *ptr = ft_malloc(10);
+    void *ptr = malloc(10);
     ptr = ft_realloc(ptr, 20);
     if (ptr != NULL)
     {
@@ -42,13 +42,13 @@ void test_ft_realloc()
     {
         printf(RED "[ ✘ ]" RESET " ft_realloc failed\n");
     }
-    ft_free(ptr);
+    free(ptr);
 }
 
-void test_ft_malloc_zero_size()
+void test_malloc_zero_size()
 {
-    void *ptr = ft_malloc(0);
-    ft_free(ptr);
+    void *ptr = malloc(0);
+    free(ptr);
     printf(GREEN "[ ✔ ]" RESET );
 }
 
@@ -57,28 +57,28 @@ void test_malloc_bigger_than_as_rlimit()
     struct rlimit limit;
 
     getrlimit(RLIMIT_AS, &limit);
-    void *ptr = ft_malloc(limit.rlim_cur + 1);
+    void *ptr = malloc(limit.rlim_cur + 1);
     if (ptr == NULL)
     {
         printf(GREEN "[ ✔ ]" RESET);
     }
     else
     {
-        printf(RED "[ ✘ ]" RESET " ft_malloc with size bigger than RLIMIT_AS (%lu) failed\n", limit.rlim_cur);
+        printf(RED "[ ✘ ]" RESET " malloc with size bigger than RLIMIT_AS (%lu) failed\n", limit.rlim_cur);
     }
 }
 
-void test_ft_free_null()
+void test_free_null()
 {
-    printf("Testing ft_free with NULL pointer...\n");
-    ft_free(NULL); // Should not crash
-    printf(GREEN "[ ✔ ]" RESET " ft_free with NULL succeeded\n");
+    printf("Testing free with NULL pointer...\n");
+    free(NULL); // Should not crash
+    printf(GREEN "[ ✔ ]" RESET " free with NULL succeeded\n");
 }
 
 void test_ft_realloc_smaller()
 {
     printf("Testing ft_realloc with smaller size...\n");
-    void *ptr = ft_malloc(20);
+    void *ptr = malloc(20);
     ptr = ft_realloc(ptr, 10);
     if (ptr != NULL)
     {
@@ -88,7 +88,7 @@ void test_ft_realloc_smaller()
     {
         printf(RED "[ ✘ ]" RESET " ft_realloc with smaller size failed\n");
     }
-    ft_free(ptr);
+    free(ptr);
 }
 
 void test_ft_realloc_null()
@@ -103,16 +103,16 @@ void test_ft_realloc_null()
     {
         printf(RED "[ ✘ ]" RESET " ft_realloc with NULL pointer failed\n");
     }
-    ft_free(ptr);
+    free(ptr);
 }
 
 int main()
 {
-    test_ft_malloc();
-    test_ft_malloc_zero_size();
-    test_malloc_bigger_than_as_rlimit();
-    // test_ft_free();
-    // test_ft_free_null();
+    test_malloc();
+    test_malloc_zero_size();
+    // test_malloc_bigger_than_as_rlimit();
+    // test_free();
+    // test_free_null();
     // test_ft_realloc();
     // test_ft_realloc_smaller();
     // test_ft_realloc_null();

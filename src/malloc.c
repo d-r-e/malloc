@@ -9,6 +9,7 @@ t_block *g_head = NULL;
 void show_alloc_mem() {
     t_block *tmp = g_head;
     size_t offset;
+    unsigned int i = 0;
 
     printf("TINY : %p\n", (void *) tmp);
 
@@ -23,13 +24,65 @@ void show_alloc_mem() {
             offset = 0;
         
 
-        printf("%p - %p : %lu bytes\n", 
+        printf("%d · %p - %p : %lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)), 
                (void *)((char *)tmp + sizeof(t_block) + offset), 
                tmp->size);
 
         tmp = tmp->next;
+        ++i;
     }
+}
+
+void hexdump(void *ptr, size_t size) {
+    unsigned char *p = (unsigned char *)ptr;
+    unsigned char c;
+    unsigned int i = 0;
+
+    while (i < size) {
+        c = p[i];
+        printf("%02x ", c);
+        ++i;
+        if (i % 16 == 0)
+            printf("\n");
+    }
+    printf("\n");
+}
+
+
+/****
+ * show_alloc_mem_ex
+ * This function shows extra information (an hex dump of allocated memory)
+*/
+void show_alloc_mem_ex(){
+    t_block *tmp = g_head;
+    size_t offset;
+    unsigned int i = 0;
+
+    printf("TINY : %p\n", (void *) tmp);
+
+    while (tmp != NULL) {
+        if (tmp->size == TINY) {
+            offset = TINY;
+        } else if (tmp->size == SMALL) {
+            offset = SMALL;
+        } else if (tmp->size == LARGE) {
+            offset = LARGE;
+        } else 
+            offset = 0;
+        
+
+        printf("%d · %p - %p : %lu bytes\n", i,
+               (void *)((char *)tmp + sizeof(t_block)), 
+               (void *)((char *)tmp + sizeof(t_block) + offset), 
+               tmp->size);
+
+        hexdump((void *)((char *)tmp + sizeof(t_block)), tmp->size);
+
+        tmp = tmp->next;
+        ++i;
+    }
+
 }
 
 
@@ -78,8 +131,8 @@ static int prealloc(void) {
         tmp = tmp->next;
     }
 
-    show_alloc_mem();
-
+    // show_alloc_mem();
+    // show_alloc_mem_ex();
     int ret = munmap(g_head, calculate_total_memory());
     if (ret == -1)
         return -1;
@@ -94,25 +147,21 @@ void *malloc(size_t size) {
     void *ptr = NULL;
     int page_size = getpagesize();
     struct rlimit limit;
+    int ret;
 
-    prealloc();
-
+    ret = prealloc();
+    if (ret)
+        return NULL;
     // printf("page size: %d\n", page_size);
     getrlimit(RLIMIT_AS, &limit);
     if (size > limit.rlim_cur)
         return NULL;
 // printf("limit: %lu\n", limit.rlim_cur);
-#ifdef DEBUG
-    printf("Malloc'ing %lu bytes 😜 \n", size);
-#endif
     if (size == 0) {
         size = page_size;
         ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, -1, 0);
         if (ptr == MAP_FAILED)
             return NULL;
-#ifdef DEBUG
-        printf("Correctly allocated %lu bytes 😜 \n", size);
-#endif
         return ptr;
     }
     return NULL;

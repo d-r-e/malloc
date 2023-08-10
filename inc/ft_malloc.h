@@ -9,9 +9,11 @@
 #include <libft.h>
 #include <stdbool.h>
 
-#define TINY 64
+#define TINY 32
 #define SMALL 1024
-#define LARGE 1024 * 1024
+#define LARGE 4096 * 4
+
+#define N_BLOCKS getpagesize() / TINY // 128
 
 /* TYPES AND STRUCTS */
 
@@ -25,8 +27,8 @@ typedef struct s_block
 
 /* SUBJECT FUNCTIONS */
 
-void *ft_malloc(size_t size);
-void ft_free(void *ptr);
+void *malloc(size_t size);
+void free(void *ptr);
 void *ft_realloc(void *ptr, size_t size);
 
 #endif
