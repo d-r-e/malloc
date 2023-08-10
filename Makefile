@@ -1,6 +1,6 @@
 CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic -g
 CC = gcc
-SRC = src/malloc.c
+SRC = src/malloc.c src/output.c
 INC = inc
 HEADER = inc/ft_malloc.h
 OBJ = $(SRC:.c=.o)
@@ -22,8 +22,8 @@ $(NAME): $(LIBRARY)
 $(LIBRARY): $(OBJ) $(LIBFT)
 	@$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
 
-$(OBJ): Makefile $(HEADER) $(SRC) $(LIBFT)
-	@$(CC) $(CFLAGS) -c $(SRC) -I libft  -L libft -lft -I $(INC) -fPIC -o $(OBJ)
+%.o: %.c $(HEADER) $(LIBFT)
+	@$(CC) $(CFLAGS) -c $< -I libft -I $(INC) -fPIC -o $@
 
 $(LIBFT):
 	@make -C libft

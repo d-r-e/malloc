@@ -25,6 +25,13 @@ typedef struct s_block
 	struct s_block *prev;
 } t_block;
 
+extern t_block *g_head;
+
+
+/* AUX FUNCTIONS */
+void show_alloc_mem_ex();
+
+
 /* SUBJECT FUNCTIONS */
 
 void *malloc(size_t size);
