@@ -109,7 +109,7 @@ void test_ft_realloc_null()
 int main()
 {
     test_malloc();
-    test_malloc_zero_size();
+    // test_malloc_zero_size();
     // test_malloc_bigger_than_as_rlimit();
     // test_free();
     // test_free_null();

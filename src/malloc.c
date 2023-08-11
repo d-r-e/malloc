@@ -35,11 +35,10 @@ void show_alloc_mem() {
 }
 
 
-
-
-
 static size_t calculate_total_memory(){
-	return (sizeof(t_block) + TINY) * N_BLOCKS + (sizeof(t_block) + SMALL) * N_BLOCKS + (sizeof(t_block) + LARGE) * N_BLOCKS;
+	return (sizeof(t_block) + TINY) * N_BLOCKS + \
+    (sizeof(t_block) + SMALL) * N_BLOCKS + \
+     (sizeof(t_block) + LARGE) * N_BLOCKS;
 }
 
 
@@ -75,13 +74,13 @@ static int prealloc(void) {
         tmp = tmp->next;
     }
     // LARGE
-    for (i = 0; i < N_BLOCKS; i++) {
-        tmp->size = LARGE;
-        tmp->inuse = false;
-        tmp->next = i < N_BLOCKS - 1 ? (t_block *)((char *)tmp + sizeof(t_block) + LARGE) : NULL;
-        tmp->prev = i > 0 ? (t_block *)((char *)tmp - sizeof(t_block) - LARGE) : NULL;
-        tmp = tmp->next;
-    }
+    // for (i = 0; i < N_BLOCKS; i++) {
+    //     tmp->size = LARGE;
+    //     tmp->inuse = false;
+    //     tmp->next = i < N_BLOCKS - 1 ? (t_block *)((char *)tmp + sizeof(t_block) + LARGE) : NULL;
+    //     tmp->prev = i > 0 ? (t_block *)((char *)tmp - sizeof(t_block) - LARGE) : NULL;
+    //     tmp = tmp->next;
+    // }
 
     // show_alloc_mem();
     // show_alloc_mem_ex();
