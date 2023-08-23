@@ -13,9 +13,13 @@
 #define SMALL 1024
 #define LARGE 4096 * 4
 
-#define N_BLOCKS getpagesize() / TINY
-
+// #define N_BLOCKS getpagesize() / TINY
+#define N_BLOCKS 4
 /* TYPES AND STRUCTS */
+
+#ifndef M_MMAP_THRESHOLD
+#define M_MMAP_THRESHOLD 128 * 1024  // 131.072
+#endif
 
 typedef struct s_block
 {
@@ -27,10 +31,8 @@ typedef struct s_block
 
 extern t_block *g_head;
 
-
 /* AUX FUNCTIONS */
 void show_alloc_mem_ex();
-
 
 /* SUBJECT FUNCTIONS */
 

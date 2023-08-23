@@ -64,7 +64,7 @@ void test_malloc_bigger_than_as_rlimit()
     }
     else
     {
-        printf(RED "[ ✘ ]" RESET " malloc with size bigger than RLIMIT_AS (%lu) failed\n", limit.rlim_cur);
+        printf(RED "[ ✘ ]" RESET " malloc with size bigger than RLIMIT_AS failed\n");
     }
 }
 
