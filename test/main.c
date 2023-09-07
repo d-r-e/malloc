@@ -7,20 +7,27 @@
 
 void test_malloc()
 {
-    void *ptr = malloc(10);
-    if (ptr != NULL)
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            ((char *)ptr)[i] = 'B';
-        }
-        printf(GREEN "[ ✔ ]"RESET);
-    }
-    else
-    {
-        printf(RED "[ ✘ ]" RESET);
-    }
-    free(ptr);
+    char *ptr = malloc(10);
+    char *ptr2 = malloc(10);
+    // char *ptr3 = malloc(20);
+
+    (void)ptr;
+    write(1, &ptr, 10);
+    puts("");
+    strncpy(ptr, "Hello", 10);
+
+    ft_strncpy(ptr2, "World", 10);
+    // ft_strncpy(ptr3, "!", 10);
+    printf("%s\n", ptr);
+    // free(ptr);
+    printf("%s\n", ptr2);
+    char *ptr3 = malloc(10);
+    ft_strncpy(ptr3, "Thistest", 10);
+    printf("%s\n", ptr3);
+    // char *ptr3 = malloc(TINY + 1);
+    // ft_strncpy(ptr3, "This is a test", TINY + 1);
+    // printf("%s\n", ptr3);
+    
 }
 
 void test_free()

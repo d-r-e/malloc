@@ -15,7 +15,7 @@ LIBFT = libft/libft.a
 
 all: $(NAME)
 
-$(NAME): $(LIBRARY)
+$(NAME): $(LIBRARY) $(SRC)
 	@ln -fs $(LIBRARY) $(NAME)
 	@echo "\033[32m[ ✔ ] $@ created\033[0m"
 

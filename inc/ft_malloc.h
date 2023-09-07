@@ -10,7 +10,7 @@
 #include <stdbool.h>
 
 #define TINY 32
-#define SMALL 1024
+#define SMALL 64
 #define LARGE 4096 * 4
 
 // #define N_BLOCKS getpagesize() / TINY
@@ -18,8 +18,9 @@
 /* TYPES AND STRUCTS */
 
 #ifndef M_MMAP_THRESHOLD
-#define M_MMAP_THRESHOLD 128 * 1024  // 131.072
+#define M_MMAP_THRESHOLD 128 * 1024
 #endif
+
 
 typedef struct s_block
 {
@@ -33,10 +34,12 @@ extern t_block *g_head;
 
 /* AUX FUNCTIONS */
 void show_alloc_mem_ex();
-
+void print_tblock_header();
+void print_hex_tblock_body(t_block *block);
 /* SUBJECT FUNCTIONS */
 
-void *malloc(size_t size);
+void *
+malloc(size_t size);
 void free(void *ptr);
 void *ft_realloc(void *ptr, size_t size);
 

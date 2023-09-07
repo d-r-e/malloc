@@ -50,3 +50,14 @@ void show_alloc_mem_ex(){
     }
 
 }
+
+void print_tblock_header(t_block block){
+    printf("in use: %d |", block.inuse);
+    printf("size  : %lu\n", block.size);
+}
+
+
+void print_hex_tblock_body(t_block *block){
+    printf("Address: %p\n", (void *)((char *)&block + sizeof(t_block)));
+    hexdump((void *)((char *)block + sizeof(t_block)), block->size);
+}
