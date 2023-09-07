@@ -9,12 +9,12 @@
 #include <libft.h>
 #include <stdbool.h>
 
-#define TINY 32
-#define SMALL 64
+#define TINY 16
+#define SMALL 128
 #define LARGE 4096 * 4
 
 // #define N_BLOCKS getpagesize() / TINY
-#define N_BLOCKS 4
+#define N_BLOCKS 42
 /* TYPES AND STRUCTS */
 
 #ifndef M_MMAP_THRESHOLD

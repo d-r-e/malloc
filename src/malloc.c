@@ -41,6 +41,20 @@ static size_t calculate_total_memory(){
      (sizeof(t_block) + LARGE) * N_BLOCKS;
 }
 
+static char get_next_printable_char(char c){
+    while (!ft_isprint(c))
+        c++;
+    return c;
+}
+
+void initialize_block(t_block *block, size_t size, size_t tblock_size, int i)
+{
+    block->size = size;
+    block->inuse = false;
+    block->next = (t_block *)((char *)block + tblock_size);
+    block->prev = i > 0 ? (t_block *)((char *)block - tblock_size) : NULL;
+    ft_memset((void *)((char *)block + sizeof(t_block)), get_next_printable_char('A' + i), size);
+}
 
 static int prealloc(void) {
     int i;
@@ -49,10 +63,8 @@ static int prealloc(void) {
     size_t small_tblock = sizeof(t_block) + SMALL;
     size_t total_memory;
 
-    if (g_head != NULL){
-        printf("already preallocated\n");
+    if (g_head != NULL)
         return 0;
-    }
     total_memory = calculate_total_memory();
     g_head = mmap(NULL, total_memory, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (g_head == MAP_FAILED)
@@ -60,24 +72,16 @@ static int prealloc(void) {
 
     // TINY
     tmp = g_head;
-    for (i = 0; i < N_BLOCKS; i++) {
-        printf("INIT TINY  i: %d\n", i);
-        tmp->size = TINY;
-        tmp->inuse = false;
-        tmp->next = (t_block *)((char *)tmp + tiny_tblock);
-        tmp->prev = i > 0 ? (t_block *)((char *)tmp - tiny_tblock) : NULL;
-        ft_memset((void *)((char *)tmp + sizeof(t_block)), 'A' + i, TINY);
+    for (i = 0; i < N_BLOCKS; i++)
+    {
+        initialize_block(tmp, TINY, tiny_tblock, i);
         tmp = tmp->next;
     }
-    // SMALL
 
-    for (i = 0; i < N_BLOCKS; i++) {
-        printf("INIT SMALL i: %d\n", i);
-        tmp->size = SMALL;
-        tmp->inuse = false;
-        tmp->next = (t_block *)((char *)tmp + small_tblock);
-        tmp->prev = i > 0 ? (t_block *)((char *)tmp - small_tblock) : NULL;
-        ft_memset((void *)((char *)tmp + sizeof(t_block)), 'A' + i, SMALL);
+    // Initialize SMALL blocks
+    for (i = 0; i < N_BLOCKS; i++)
+    {
+        initialize_block(tmp, SMALL, small_tblock, i);
         tmp = tmp->next;
     }
     // LARGE
@@ -145,12 +149,15 @@ void *malloc(size_t size) {
                 print_hex_tblock_body(ptr);
                 return (void *)((char *)ptr + sizeof(t_block));
             }
-            printf(" SMALL i: %d\n", i);
             ptr = ptr->next;
         }
     }
-    
-        printf("malloc failed\n");
+    else{
+        ptr = mmap(NULL, size + sizeof(t_block), PROT_READ | PROT_WRITE, MAP_PRIVATE, -1, 0);
+        if (ptr == MAP_FAILED)
+            return NULL;
+        return ptr;
+    }
     return NULL;
 }
 
