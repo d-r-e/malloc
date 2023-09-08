@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -Wformat-security -pedantic -g
+CFLAGS = -Wall -Wextra -Werror  -g -Wformat-security -Wpedantic
 CC = gcc
 SRC = src/malloc.c src/output.c src/free.c
 INC = inc
@@ -41,6 +41,16 @@ test: $(LIBRARY)
 
 x: $(NAME)
 	$(CC) $(CFLAGS) -o test.out test/main.c -I libft -L libft -lft  -I $(INC) -L . -lmalloc
+	@ulimit -n 4096
+	@LD_LIBRARY_PATH=. ./test.out
+	@rm -f test.out
+
+
+
+u: unit
+
+unit: $(NAME)
+	$(CC) $(CFLAGS) -o test.out test/unit_test.c -I libft -L libft -lft -I $(INC) -L . -lmalloc
 	@ulimit -n 4096
 	@LD_LIBRARY_PATH=. ./test.out
 	@rm -f test.out

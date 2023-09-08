@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ft_malloc.h>
 
 #define GREEN "\033[32m"
@@ -7,6 +9,8 @@
 
 void test_malloc()
 {
+    int page_size = getpagesize();
+    printf("page_size %d\n", page_size);
     char *ptr = malloc(100);
     char *ptr2 = malloc(10);
     // char *ptr3 = malloc(20);
@@ -17,99 +21,27 @@ void test_malloc()
     printf("%s\n", ptr);
     // free(ptr);
     printf("%s\n", ptr2);
-    char *ptr3 = malloc(10);
-    ft_strncpy(ptr3, "Thistest", 10);
-    printf("%s\n", ptr3);
-    char *ptr4 = malloc(0);
-    (void)ptr4;
+    char *ptr3 = malloc(100);
+    if (ptr3 == NULL){
+        puts("malloc failed\n");
+        exit(-1);
+    }
+    else {
+        puts("malloc succeeded\n");
+    }
+    strncpy(ptr3, "Thistest", 10);
+    free(ptr);
+    free(ptr2);
+    free(ptr3);
+    // printf("%s\n", ptr3);
+    // char *ptr4 = malloc(0);
+    // (void)ptr4;
     // char *ptr3 = malloc(TINY + 1);
     // ft_strncpy(ptr3, "This is a test", TINY + 1);
     // printf("%s\n", ptr3);
     
 }
 
-void test_free()
-{
-    void *ptr = malloc(10);
-    free(ptr);
-    printf(GREEN "[ ✔ ]" RESET );
-}
-
-void test_ft_realloc()
-{
-    void *ptr = malloc(10);
-    ptr = ft_realloc(ptr, 20);
-    if (ptr != NULL)
-    {
-        printf(GREEN "[ ✔ ]" RESET);
-    }
-    else
-    {
-        printf(RED "[ ✘ ]" RESET " ft_realloc failed\n");
-    }
-    free(ptr);
-}
-
-void test_malloc_zero_size()
-{
-    void *ptr = malloc(0);
-    free(ptr);
-    printf(GREEN "[ ✔ ]" RESET );
-}
-
-void test_malloc_bigger_than_as_rlimit()
-{
-    struct rlimit limit;
-
-    getrlimit(RLIMIT_AS, &limit);
-    void *ptr = malloc(limit.rlim_cur + 1);
-    if (ptr == NULL)
-    {
-        printf(GREEN "[ ✔ ]" RESET);
-    }
-    else
-    {
-        printf(RED "[ ✘ ]" RESET " malloc with size bigger than RLIMIT_AS failed\n");
-    }
-}
-
-void test_free_null()
-{
-    printf("Testing free with NULL pointer...\n");
-    free(NULL); // Should not crash
-    printf(GREEN "[ ✔ ]" RESET " free with NULL succeeded\n");
-}
-
-void test_ft_realloc_smaller()
-{
-    printf("Testing ft_realloc with smaller size...\n");
-    void *ptr = malloc(20);
-    ptr = ft_realloc(ptr, 10);
-    if (ptr != NULL)
-    {
-        printf(GREEN "[ ✔ ]" RESET " ft_realloc with smaller size succeeded\n");
-    }
-    else
-    {
-        printf(RED "[ ✘ ]" RESET " ft_realloc with smaller size failed\n");
-    }
-    free(ptr);
-}
-
-void test_ft_realloc_null()
-{
-    printf("Testing ft_realloc with NULL pointer...\n");
-    void *ptr = ft_realloc(NULL, 10);
-    if (ptr != NULL) // Depending on the implementation, you might expect this to act like malloc
-    {
-        printf(GREEN "[ ✔ ]" RESET " ft_realloc with NULL pointer succeeded\n");
-    }
-    else
-    {
-        printf(RED "[ ✘ ]" RESET " ft_realloc with NULL pointer failed\n");
-    }
-    free(ptr);
-}
 
 int main()
 {
@@ -121,6 +53,5 @@ int main()
     // test_ft_realloc();
     // test_ft_realloc_smaller();
     // test_ft_realloc_null();
-    ft_puts("");
     return 0;
 }
