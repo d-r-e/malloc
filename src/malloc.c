@@ -1,7 +1,6 @@
 #include <ft_malloc.h>
 
-t_block *g_head = NULL;
-t_block *g_head_small = NULL;
+t_heap g_heap = {NULL, NULL, NULL};
 
 /***
  * show_alloc_mem
@@ -9,29 +8,26 @@ t_block *g_head_small = NULL;
  */
 void show_alloc_mem()
 {
-    t_block *tmp = g_head;
-    size_t offset;
-    unsigned int i = 0;
-
+    t_block *tmp = g_heap.tiny;
     printf("TINY : %p\n", (void *)tmp);
-
-    while (tmp != NULL)
+    for (unsigned int i = 0; i < N_BLOCKS && tmp; i++)
     {
-        if (tmp->size == TINY)
-            offset = TINY;
-        else if (tmp->size == SMALL)
-            offset = SMALL;
-        else if (tmp->size == LARGE)
-            offset = LARGE;
-        else
-            offset = 0;
-        printf("%d · %p - %p : %lu bytes\n", i,
+        printf("%3d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),
-               (void *)((char *)tmp + sizeof(t_block) + offset),
+               (void *)((char *)tmp + sizeof(t_block) + TINY),
                tmp->size);
 
         tmp = tmp->next;
-        ++i;
+    }
+    tmp = g_heap.small;
+    printf("SMALL: %p\n", (void *)tmp);
+    for (unsigned int i = 0; i < N_BLOCKS && tmp; i++){
+        printf("%3d · %p - %p : %3lu bytes\n", i,
+               (void *)((char *)tmp + sizeof(t_block)),
+               (void *)((char *)tmp + sizeof(t_block) + SMALL),
+               tmp->size);
+
+        tmp = tmp->next;
     }
 }
 
@@ -66,39 +62,41 @@ static int prealloc(void)
     size_t small_tblock = sizeof(t_block) + SMALL;
     size_t total_memory;
 
-    if (g_head != NULL)
+    if (g_heap.tiny != NULL)
         return 0;
     total_memory = calculate_total_memory();
-    g_head = mmap(NULL, total_memory, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (g_head == MAP_FAILED)
+    g_heap.tiny = mmap(NULL, (sizeof(t_block) + TINY) * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (g_heap.tiny == MAP_FAILED)
     {
         printf("mmap failed\n");
         return -1;
     }
-
+    printf("g_head %p\n", g_heap.tiny);
     // TINY
-    tmp = g_head;
+    tmp = g_heap.tiny;
     for (i = 0; i < N_BLOCKS; i++)
     {
         initialize_block(tmp, TINY, tiny_tblock, i);
         tmp = tmp->next;
     }
-
+    g_heap.small = mmap(NULL, (sizeof(t_block) + SMALL) * N_BLOCKS, PROT_READ| PROT_WRITE, MAP_PRIVATE |MAP_ANONYMOUS, -1, 0);
+    if (g_heap.small == MAP_FAILED)
+    {
+        printf("mmap failed\n");
+        return -1;
+    }
+    printf("g_heap.small %p\n ", g_heap.small);
+    tmp = g_heap.small;
     // Initialize SMALL blocks
     for (i = 0; i < N_BLOCKS; i++)
     {
         initialize_block(tmp, SMALL, small_tblock, i);
         tmp = tmp->next;
     }
-    // show_alloc_mem();
+    show_alloc_mem();
     // show_alloc_mem_ex();
-    // int ret = munmap(g_head, calculate_total_memory());
-    // if (ret == -1)
-    //     return -1;
     return 0;
 }
-
-
 
 /// @brief Well it's malloc!
 /// @param size bytes to allocate
@@ -106,17 +104,10 @@ static int prealloc(void)
 void *malloc(size_t size)
 {
     void *ptr = NULL;
-    // int page_size;
-    
-    // printf("pagesize %d\n", page_size);
     struct rlimit limit;
     int ret = 0;
 
-    // (void)page_size;
-    // page_size = sysconf(_SC_PAGESIZE);
-        // printf("page_size %d\n", page_size);
     ret = prealloc();
-    (void)prealloc;
     // show_alloc_mem_ex();
     if (ret)
         return NULL;
@@ -125,7 +116,7 @@ void *malloc(size_t size)
         return NULL;
     else if (size && size <= SMALL)
     {
-        t_block *ptr = g_head;
+        t_block *ptr = g_heap.tiny;
         int i = 0;
         while (ptr && ptr->size == TINY)
         {
@@ -134,23 +125,27 @@ void *malloc(size_t size)
             if (ptr->inuse == false && size <= TINY)
             {
                 ptr->inuse = true;
-                // printf("FOUND TINY i: %d %p\n", i, (void *)((char *)ptr + sizeof(t_block)));
+                printf("FOUND TINY  i: %d %p\n", i, (void *)((char *)ptr + sizeof(t_block)));
                 return (void *)((char *)ptr + sizeof(t_block));
             }
             ptr = ptr->next;
         }
-        while (ptr && ptr->size == SMALL && size <= SMALL)
+        if (size > TINY && size <= SMALL)
         {
-            i++;
-            // print_tblock_header(*ptr);
-            if (ptr->inuse == false)
+            ptr = g_heap.small;
+            i = 0;
+            while (ptr && ptr->size == SMALL && size <= SMALL)
             {
-                ptr->inuse = true;
-                // printf("FOUND SMALL i: %d\n", i);
-                // print_hex_tblock_body(ptr);
-                return (void *)((char *)ptr + sizeof(t_block));
+                i++;
+                // print_tblock_header(*ptr);
+                if (ptr->inuse == false)
+                {
+                    ptr->inuse = true;
+                    // print_hex_tblock_body(ptr);
+                    return (void *)((char *)ptr + sizeof(t_block));
+                }
+                ptr = ptr->next;
             }
-            ptr = ptr->next;
         }
     }
     else
@@ -159,7 +154,7 @@ void *malloc(size_t size)
                    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (ptr == MAP_FAILED)
         {
-            printf("error: mmap failed.\n");
+            ft_putstr("error: mmap failed.\n");
             return NULL;
         }
         return &((char *)ptr)[sizeof(t_block)];

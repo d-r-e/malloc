@@ -11,9 +11,9 @@ static void hexdump(void *ptr, size_t size) {
         printf("%02x ", c);
         ++i;
         if (i % 16 == 0)
-            printf("\n");
+            ft_putstr("\n");
     }
-    printf("\n");
+    ft_putstr("\n");
 }
 
 /****
@@ -21,30 +21,17 @@ static void hexdump(void *ptr, size_t size) {
  * This function shows extra information (an hex dump of allocated memory)
 */
 void show_alloc_mem_ex(){
-    t_block *tmp = g_head;
-    size_t offset;
+    t_block *tmp = g_heap.tiny;
     unsigned int i = 0;
 
     printf("TINY : %p\n", (void *) tmp);
 
-    while (tmp != NULL) {
-        if (tmp->size == TINY) {
-            offset = TINY;
-        } else if (tmp->size == SMALL) {
-            offset = SMALL;
-        } else if (tmp->size == LARGE) {
-            offset = LARGE;
-        } else 
-            offset = 0;
-        
-
+    while (tmp) {
         printf("%d · %p - %p : %lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)), 
-               (void *)((char *)tmp + sizeof(t_block) + offset), 
+               (void *)((char *)tmp + sizeof(t_block) + TINY), 
                tmp->size);
-
         hexdump((void *)((char *)tmp + sizeof(t_block)), tmp->size);
-
         tmp = tmp->next;
         ++i;
     }
@@ -53,7 +40,8 @@ void show_alloc_mem_ex(){
 
 void print_tblock_header(t_block block){
     printf("in use: %d |", block.inuse);
-    printf("size  : %lu\n", block.size);
+    printf("size  : %lu  | ", block.size);
+    printf("next  : %p", (void*)block.next);
 }
 
 

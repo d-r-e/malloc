@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror  -g -Wformat-security -Wpedantic
+CFLAGS = -Wall -Wextra -Werror --std=c11
 CC = gcc
 SRC = src/malloc.c src/output.c src/free.c
 INC = inc

@@ -32,15 +32,22 @@ typedef struct s_block
 	struct s_block *prev;
 } t_block;
 
-extern t_block *g_head;
+typedef struct s_heap {
+	t_block * tiny;
+	t_block *small;
+	t_block *large;
+} t_heap;
+
+extern t_heap g_heap;
 
 /* AUX FUNCTIONS */
 void show_alloc_mem_ex();
 void print_tblock_header();
 void print_hex_tblock_body(t_block *block);
 size_t calculate_total_memory();
-/* SUBJECT FUNCTIONS */
 
+
+/* SUBJECT FUNCTIONS */
 void *malloc(size_t size);
 void free(void *ptr);
 void *ft_realloc(void *ptr, size_t size);

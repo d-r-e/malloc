@@ -9,30 +9,33 @@
 
 void test_malloc()
 {
-    int page_size = getpagesize();
-    printf("page_size %d\n", page_size);
-    char *ptr = malloc(100);
-    char *ptr2 = malloc(10);
-    // char *ptr3 = malloc(20);
+    // int page_size = getpagesize();
+    // printf("page_size %d\n", page_size);
+    char *ptr1 = malloc(10);
+    char *ptr2;
+    
+    ptr2= malloc(3);
+    char *ptr3 = malloc(10);
 
-    ft_strncpy(ptr, "Hello", 100);
+    strncpy(ptr1, "", 10);
+    
 
-    ft_strncpy(ptr2, "World", 10);
-    printf("%s\n", ptr);
-    // free(ptr);
+    strlcpy(ptr2, "TEST", strlen("TEST") + 1);
+    printf("%s\n", ptr1);
     printf("%s\n", ptr2);
-    char *ptr3 = malloc(100);
-    if (ptr3 == NULL){
-        puts("malloc failed\n");
-        exit(-1);
-    }
-    else {
-        puts("malloc succeeded\n");
-    }
-    strncpy(ptr3, "Thistest", 10);
-    free(ptr);
-    free(ptr2);
-    free(ptr3);
+    // if (ptr3 == NULL){
+    //     ft_puts("malloc failed\n");
+    //     exit(-1);
+    // }
+    // else {
+    //     ft_puts("malloc succeeded\n");
+    // }
+    strncpy(ptr3, "K ON MY D", 10);
+    // printf("%s\n", ptr3);
+    // free(ptr1);
+    // free(ptr2);
+    // free(ptr3);
+    // system("leaks test.out");
     // printf("%s\n", ptr3);
     // char *ptr4 = malloc(0);
     // (void)ptr4;
@@ -46,12 +49,5 @@ void test_malloc()
 int main()
 {
     test_malloc();
-    // test_malloc_zero_size();
-    // test_malloc_bigger_than_as_rlimit();
-    // test_free();
-    // test_free_null();
-    // test_ft_realloc();
-    // test_ft_realloc_smaller();
-    // test_ft_realloc_null();
     return 0;
 }
