@@ -5,3 +5,6 @@
 .vscode
 .devcontainer
 *.pdf
+test
+*.out
+CMakeLists.txt
