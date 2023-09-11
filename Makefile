@@ -17,7 +17,7 @@ LIBFT = libft/libft.a
 all: $(NAME)
 
 $(NAME): $(LIBRARY) $(SRC)
-	bin/ln -fs $(LIBRARY) $(NAME)
+	ln -fs $(LIBRARY) $(NAME)
 	echo "\033[32m[ ✔ ] $@ created\033[0m"
 
 $(LIBRARY): $(OBJ) $(LIBFT)
