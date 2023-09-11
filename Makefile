@@ -17,18 +17,18 @@ LIBFT = libft/libft.a
 all: $(NAME)
 
 $(NAME): $(LIBRARY) $(SRC)
-	@ln -fs $(LIBRARY) $(NAME)
-	@echo "\033[32m[ ✔ ] $@ created\033[0m"
+	bin/ln -fs $(LIBRARY) $(NAME)
+	echo "\033[32m[ ✔ ] $@ created\033[0m"
 
 $(LIBRARY): $(OBJ) $(LIBFT)
-	@$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
+	$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
 
 %.o: %.c $(HEADER) $(LIBFT)
-	@$(CC) $(CFLAGS) -c $< -I libft -I $(INC) -fPIC -o $@
+	$(CC) $(CFLAGS) -c $< -I libft -I $(INC) -fPIC -o $@
 
 $(LIBFT):
-	@make -C libft
-	@echo "\033[32m[ ✔ ] $@ created\033[0m"
+	make -C libft
+	echo "\033[32m[ ✔ ] $@ created\033[0m"
 
 clean:
 	make -C libft clean
@@ -41,15 +41,15 @@ test: $(LIBRARY) test_src/main.c
 
 
 x: $(NAME) test
-	@ulimit -n 4096
-	@LD_LIBRARY_PATH=. ./test
+	ulimit -n 4096
+	LD_LIBRARY_PATH=. ./test
 
 
 unit: $(NAME)
 	$(CC) $(CFLAGS) -o test test_src/unit_test.c -I libft -L libft -lft -I $(INC) -L . -lmalloc
-	@ulimit -n 4096
-	@LD_LIBRARY_PATH=. ./test
-	@rm -f test
+	ulimit -n 4096
+	LD_LIBRARY_PATH=. ./test
+	rm -f test
 
 fclean: clean
 	make -C libft fclean
