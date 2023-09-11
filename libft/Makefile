@@ -15,7 +15,7 @@ RM = rm -f
 
 CC = gcc
 
-CCFLAGS = -Wall -Wextra -Werror
+CCFLAGS = -Wall -Wextra -Werror -fPIC
 
 NAME = libft.a
 

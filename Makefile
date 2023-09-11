@@ -1,5 +1,6 @@
-CFLAGS = -Wall -Wextra -Werror --std=c11
+CFLAGS = -Wall -Wextra -Werror -O2 -g
 CC = gcc
+CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c
 INC = inc
 HEADER = inc/ft_malloc.h
@@ -33,27 +34,22 @@ clean:
 	make -C libft clean
 	rm -f $(OBJ)
 
-test: $(LIBRARY)
-	$(CC) $(CFLAGS) -o test.out test/main.c -I $(INC)  -I libft  -L libft -lft -L . -lmalloc
+
+
+test: $(LIBRARY) test_src/main.c
+	$(CC) $(CFLAGS) -o ./test test_src/main.c -I $(INC)  -I libft  -L libft -lft -L . -lmalloc
+
+
+x: $(NAME) test
 	@ulimit -n 4096
-	LD_LIBRARY_PATH=. valgrind -s --leak-check=full ./test.out
-	rm -f test.out
+	@LD_LIBRARY_PATH=. ./test
 
-x: $(NAME)
-	$(CC) $(CFLAGS) -o test.out test/main.c -I libft -L libft -lft  -I $(INC) -L . -lmalloc
-	@ulimit -n 4096
-	@LD_LIBRARY_PATH=. ./test.out
-	@rm -f test.out
-
-
-
-u: unit
 
 unit: $(NAME)
-	$(CC) $(CFLAGS) -o test.out test/unit_test.c -I libft -L libft -lft -I $(INC) -L . -lmalloc
+	$(CC) $(CFLAGS) -o test test_src/unit_test.c -I libft -L libft -lft -I $(INC) -L . -lmalloc
 	@ulimit -n 4096
-	@LD_LIBRARY_PATH=. ./test.out
-	@rm -f test.out
+	@LD_LIBRARY_PATH=. ./test
+	@rm -f test
 
 fclean: clean
 	make -C libft fclean
@@ -61,4 +57,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re test
+.PHONY: all clean fclean re

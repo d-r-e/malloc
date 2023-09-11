@@ -17,10 +17,10 @@ void test_malloc()
     ptr2= malloc(3);
     char *ptr3 = malloc(10);
 
-    strncpy(ptr1, "", 10);
+    ft_strlcpy(ptr1, "", 10);
     
 
-    strlcpy(ptr2, "TEST", strlen("TEST") + 1);
+    ft_strlcpy(ptr2, "TEST", strlen("TEST") + 1);
     printf("%s\n", ptr1);
     printf("%s\n", ptr2);
     // if (ptr3 == NULL){
@@ -30,17 +30,17 @@ void test_malloc()
     // else {
     //     ft_puts("malloc succeeded\n");
     // }
-    strncpy(ptr3, "K ON MY D", 10);
+    ft_strlcpy(ptr3, "K ON MY D", 10);
     // printf("%s\n", ptr3);
     // free(ptr1);
     // free(ptr2);
     // free(ptr3);
-    // system("leaks test.out");
+    // system("leaks test_src.out");
     // printf("%s\n", ptr3);
     // char *ptr4 = malloc(0);
     // (void)ptr4;
     // char *ptr3 = malloc(TINY + 1);
-    // ft_strncpy(ptr3, "This is a test", TINY + 1);
+    // ft_strncpy(ptr3, "This is a test_src", TINY + 1);
     // printf("%s\n", ptr3);
     
 }

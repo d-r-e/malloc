@@ -60,11 +60,9 @@ static int prealloc(void)
     t_block *tmp = NULL;
     size_t tiny_tblock = sizeof(t_block) + TINY;
     size_t small_tblock = sizeof(t_block) + SMALL;
-    size_t total_memory;
 
     if (g_heap.tiny != NULL)
         return 0;
-    total_memory = calculate_total_memory();
     g_heap.tiny = mmap(NULL, (sizeof(t_block) + TINY) * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (g_heap.tiny == MAP_FAILED)
     {

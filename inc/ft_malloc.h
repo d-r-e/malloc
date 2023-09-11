@@ -14,16 +14,15 @@
 #define SMALL 128
 #define LARGE 4096 * 4
 
-// #define N_BLOCKS getpagesize() / TINY
 #define N_BLOCKS 128
 
 #define FREE_ERROR_STRING "error: munmap: Could not free addressed memory."
-/* TYPES AND STRUCTS */
 
 #ifndef M_MMAP_THRESHOLD
 #define M_MMAP_THRESHOLD 128 * 1024
 #endif
 
+/* TYPES AND STRUCTS */
 typedef struct s_block
 {
 	size_t size;

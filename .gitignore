@@ -3,6 +3,7 @@
 *.so
 *.a
 .vscode
+.idea
 .devcontainer
 *.pdf
 test
