@@ -9,3 +9,6 @@
 test
 *.out
 CMakeLists.txt
+CMakeFiles
+*.cmake
+CMake*
