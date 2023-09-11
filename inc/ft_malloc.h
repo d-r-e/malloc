@@ -25,6 +25,7 @@
 /* TYPES AND STRUCTS */
 typedef struct s_block
 {
+    char signature[4];
 	size_t size;
 	bool inuse;
 	struct s_block *next;
@@ -41,14 +42,11 @@ extern t_heap g_heap;
 
 /* AUX FUNCTIONS */
 void show_alloc_mem_ex();
-void print_tblock_header();
-void print_hex_tblock_body(t_block *block);
-size_t calculate_total_memory();
+void show_alloc_mem();
 
 
 /* SUBJECT FUNCTIONS */
 void *malloc(size_t size);
 void free(void *ptr);
-void *ft_realloc(void *ptr, size_t size);
 
 #endif

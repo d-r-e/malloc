@@ -2,41 +2,7 @@
 
 t_heap g_heap = {NULL, NULL, NULL};
 
-/***
- * show_alloc_mem
- * This function is used to print the memory allocation of the pre-allocated blocks.
- */
-void show_alloc_mem()
-{
-    t_block *tmp = g_heap.tiny;
-    printf("TINY : %p\n", (void *)tmp);
-    for (unsigned int i = 0; i < N_BLOCKS && tmp; i++)
-    {
-        printf("%3d · %p - %p : %3lu bytes\n", i,
-               (void *)((char *)tmp + sizeof(t_block)),
-               (void *)((char *)tmp + sizeof(t_block) + TINY),
-               tmp->size);
 
-        tmp = tmp->next;
-    }
-    tmp = g_heap.small;
-    printf("SMALL: %p\n", (void *)tmp);
-    for (unsigned int i = 0; i < N_BLOCKS && tmp; i++){
-        printf("%3d · %p - %p : %3lu bytes\n", i,
-               (void *)((char *)tmp + sizeof(t_block)),
-               (void *)((char *)tmp + sizeof(t_block) + SMALL),
-               tmp->size);
-
-        tmp = tmp->next;
-    }
-}
-
-size_t calculate_total_memory()
-{
-    return (sizeof(t_block) + TINY) * N_BLOCKS +
-           (sizeof(t_block) + SMALL) * N_BLOCKS +
-           (sizeof(t_block) + LARGE) * N_BLOCKS;
-}
 
 static char get_next_printable_char(char c)
 {
@@ -45,7 +11,7 @@ static char get_next_printable_char(char c)
     return c;
 }
 
-void initialize_block(t_block *block, size_t size, size_t tblock_size, int i)
+static void initialize_block(t_block *block, size_t size, size_t tblock_size, int i)
 {
     block->size = size;
     block->inuse = false;
@@ -96,6 +62,13 @@ static int prealloc(void)
     return 0;
 }
 
+
+static int extend_heap(t_block *mem){
+    (void)mem;
+    return(0);
+}
+
+
 /// @brief Well it's malloc!
 /// @param size bytes to allocate
 /// @return a pointer to memory or NULL in case of failure
@@ -144,6 +117,7 @@ void *malloc(size_t size)
                 }
                 ptr = ptr->next;
             }
+            extend_heap(ptr);
         }
     }
     else

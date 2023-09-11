@@ -9,8 +9,6 @@
 
 void test_malloc()
 {
-    // int page_size = getpagesize();
-    // printf("page_size %d\n", page_size);
     char *ptr1 = malloc(10);
     char *ptr2;
     

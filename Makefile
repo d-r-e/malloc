@@ -13,12 +13,15 @@ endif
 NAME = libmalloc.so
 LIBRARY = libmalloc_$(HOSTTYPE).so
 LIBFT = libft/libft.a
+SYMLINK = ln -fs
+RM = rm -f
+
 
 all: $(NAME)
 
 $(NAME): $(LIBRARY) $(SRC)
-	ln -fs $(LIBRARY) $(NAME)
-	echo "\033[32m[ ✔ ] $@ created\033[0m"
+	$(SYMLINK) $(LIBRARY) $(NAME)
+	@echo $@ created
 
 $(LIBRARY): $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
@@ -28,11 +31,11 @@ $(LIBRARY): $(OBJ) $(LIBFT)
 
 $(LIBFT):
 	make -C libft
-	echo "\033[32m[ ✔ ] $@ created\033[0m"
+	echo $@ created
 
 clean:
-	make -C libft clean
-	rm -f $(OBJ)
+	$(MAKE) -C libft clean
+	$(RM) $(OBJ)
 
 
 
