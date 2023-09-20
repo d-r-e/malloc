@@ -43,14 +43,15 @@ test: $(LIBRARY) test_src/main.c
 	$(CC) $(CFLAGS) -o ./test test_src/main.c -I $(INC)  -I libft  -L libft -lft -L . -lmalloc
 
 
-x: $(NAME) test
-	ulimit -n 4096
-	LD_LIBRARY_PATH=. ./test
+x: test
+	@ulimit -n 4096
+	@LD_LIBRARY_PATH=. ./test
+	@$(RM) ./test
 
 
 unit: $(NAME)
 	$(CC) $(CFLAGS) -o test test_src/unit_test.c -I libft -L libft -lft -I $(INC) -L . -lmalloc
-	ulimit -n 4096
+	@ulimit -n 4096
 	LD_LIBRARY_PATH=. ./test
 	rm -f test
 
