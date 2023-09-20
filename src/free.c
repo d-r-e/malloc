@@ -1,4 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/15 16:14:16 by darodrig          #+#    #+#             */
+/*   Updated: 2023/09/15 18:49:11 by darodrig         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <ft_malloc.h>
+
+void defragment_block(t_block *block){
+    t_block* ptr = block;
+
+    if (block->next && block->next->next){
+        (void)ptr;
+    }
+}
 
 void free(void *ptr)
 {
@@ -29,7 +49,7 @@ void free(void *ptr)
     }
     if (clear_blocks == N_BLOCKS)
     {
-        res = munmap(g_heap.tiny, (sizeof(t_block) + TINY) * N_BLOCKS);
+        res = munmap(g_heap.tiny, (sizeof(t_block) + TINY) * clear_blocks);
         if (res)
         {
             ft_putstr("munmap failed at free\n");

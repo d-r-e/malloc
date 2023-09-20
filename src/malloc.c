@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   malloc.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
+/*   Updated: 2023/09/15 18:39:32 by darodrig         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <ft_malloc.h>
 
 t_heap g_heap = {NULL, NULL, NULL};
@@ -16,8 +28,8 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
     block->size = size;
     block->inuse = false;
     block->next = (t_block *)((char *)block + tblock_size);
-    block->prev = i > 0 ? (t_block *)((char *)block - tblock_size) : NULL;
-    ft_memset((void *)((char *)block + sizeof(t_block)), get_next_printable_char('A' + i), size);
+    block->prev = (i > 0) ? (t_block *)((char *)block - tblock_size) : NULL;
+    ft_memset((void *)((char *)block + sizeof(t_block)), get_next_printable_char('B' + i), size);
 }
 
 static int prealloc(void)
@@ -35,37 +47,55 @@ static int prealloc(void)
         printf("mmap failed\n");
         return -1;
     }
-    printf("g_head %p\n", g_heap.tiny);
     // TINY
     tmp = g_heap.tiny;
     for (i = 0; i < N_BLOCKS; i++)
     {
         initialize_block(tmp, TINY, tiny_tblock, i);
+        if (i == N_BLOCKS - 1)
+            tmp->next = NULL;
         tmp = tmp->next;
     }
-    g_heap.small = mmap(NULL, (sizeof(t_block) + SMALL) * N_BLOCKS, PROT_READ| PROT_WRITE, MAP_PRIVATE |MAP_ANONYMOUS, -1, 0);
+    g_heap.small = mmap(NULL, (sizeof(t_block) + SMALL) * N_BLOCKS, PROT_READ| PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (g_heap.small == MAP_FAILED)
     {
         printf("mmap failed\n");
         return -1;
     }
-    printf("g_heap.small %p\n ", g_heap.small);
     tmp = g_heap.small;
-    // Initialize SMALL blocks
     for (i = 0; i < N_BLOCKS; i++)
     {
         initialize_block(tmp, SMALL, small_tblock, i);
+        if (i == N_BLOCKS -1)
+            tmp->next = NULL;
         tmp = tmp->next;
     }
-    show_alloc_mem();
-    // show_alloc_mem_ex();
+    // show_alloc_mem();
+    show_alloc_mem_ex();
     return 0;
 }
 
 
-static int extend_heap(t_block *mem){
-    (void)mem;
-    return(0);
+static int extend_heap(t_block *mem, size_t size){
+    
+    t_block *tmp = NULL;
+    
+    size_t size_to_extend = N_BLOCKS * ( sizeof(t_block) + size);
+    tmp = mmap(NULL, size_to_extend, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (tmp == MAP_FAILED)
+    {
+        printf("mmap failed\n");
+        return -1;
+    }
+    mem->next = tmp;
+    for (int i = 0; i < N_BLOCKS; i++)
+    {
+        initialize_block(tmp, size, size + sizeof(t_block), i);
+        if (i == N_BLOCKS - 1)
+            tmp->next = NULL;
+        tmp = tmp->next;
+    }
+    return 0;
 }
 
 
@@ -96,9 +126,11 @@ void *malloc(size_t size)
             if (ptr->inuse == false && size <= TINY)
             {
                 ptr->inuse = true;
-                printf("FOUND TINY  i: %d %p\n", i, (void *)((char *)ptr + sizeof(t_block)));
+                // printf("FOUND TINY  i: %d %p\n", i, (void *)((char *)ptr + sizeof(t_block)));
                 return (void *)((char *)ptr + sizeof(t_block));
             }
+            if (ptr->next == NULL)
+                extend_heap(ptr, TINY);
             ptr = ptr->next;
         }
         if (size > TINY && size <= SMALL)
@@ -108,16 +140,15 @@ void *malloc(size_t size)
             while (ptr && ptr->size == SMALL && size <= SMALL)
             {
                 i++;
-                // print_tblock_header(*ptr);
                 if (ptr->inuse == false)
                 {
                     ptr->inuse = true;
-                    // print_hex_tblock_body(ptr);
                     return (void *)((char *)ptr + sizeof(t_block));
                 }
+                if (ptr->next == NULL)
+                    extend_heap(ptr, SMALL);
                 ptr = ptr->next;
             }
-            extend_heap(ptr);
         }
     }
     else

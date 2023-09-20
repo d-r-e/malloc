@@ -9,37 +9,36 @@
 
 void test_malloc()
 {
-    char *ptr1 = malloc(10);
-    char *ptr2;
-    
-    ptr2= malloc(3);
-    char *ptr3 = malloc(10);
-
+    char *ptr1 = malloc(SMALL);
     ft_strlcpy(ptr1, "", 10);
-    
 
-    ft_strlcpy(ptr2, "TEST", strlen("TEST") + 1);
-    printf("%s\n", ptr1);
-    printf("%s\n", ptr2);
-    // if (ptr3 == NULL){
-    //     ft_puts("malloc failed\n");
-    //     exit(-1);
-    // }
-    // else {
-    //     ft_puts("malloc succeeded\n");
-    // }
-    ft_strlcpy(ptr3, "K ON MY D", 10);
-    // printf("%s\n", ptr3);
-    // free(ptr1);
-    // free(ptr2);
-    // free(ptr3);
-    // system("leaks test_src.out");
-    // printf("%s\n", ptr3);
-    // char *ptr4 = malloc(0);
-    // (void)ptr4;
-    // char *ptr3 = malloc(TINY + 1);
-    // ft_strncpy(ptr3, "This is a test_src", TINY + 1);
-    // printf("%s\n", ptr3);
+    {
+        const size_t num_iter = 100;
+        char *ptrs[num_iter];
+
+
+        for (size_t i = 0; i < num_iter; ++i)
+        {
+            ptrs[i] = malloc(SMALL);
+            ft_strlcpy(ptrs[i], "TEST", strlen("TEST") + 1);
+            if (!ft_strncmp(ptrs[i], "TEST", strlen("TEST") + 1))
+                printf(GREEN "OK\n" RESET);
+            else
+                printf(RED "KO\n" RESET);
+            
+        }
+        for (size_t i = 0; i < num_iter; ++i)
+        {
+            free(ptrs[i]);
+        }
+    }
+
+    // char *ptr2 = malloc(TINY);
+    // ft_strlcpy(ptr2, "TEST", strlen("TEST") + 1);
+    
+    
+    // char *ptr3 = malloc(32);
+    // ft_strlcpy(ptr3, "K ON MY D", 10);
     
 }
 

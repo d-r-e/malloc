@@ -14,13 +14,19 @@
 #define SMALL 128
 #define LARGE 4096 * 4
 
-#define N_BLOCKS 128
+#define N_BLOCKS 4
 
 #define FREE_ERROR_STRING "error: munmap: Could not free addressed memory."
 
 #ifndef M_MMAP_THRESHOLD
 #define M_MMAP_THRESHOLD 128 * 1024
 #endif
+
+#define C_RED "\e[1;31m"
+#define C_BLU "\e[1;34m"
+
+#define CPRP "\e[1;35m"
+#define ENDC "\e[0m"
 
 /* TYPES AND STRUCTS */
 typedef struct s_block
