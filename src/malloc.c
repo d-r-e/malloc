@@ -71,7 +71,7 @@ static int prealloc(void)
         tmp = tmp->next;
     }
     // show_alloc_mem();
-    show_alloc_mem_ex();
+//    show_alloc_mem_ex();
     return 0;
 }
 
