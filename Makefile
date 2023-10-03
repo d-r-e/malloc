@@ -2,10 +2,10 @@ CFLAGS = -Wall -Wextra -Werror -O2 -g
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c
-INC = inc
+INCLUDE = inc
 HEADER = inc/ft_malloc.h
 OBJ = $(SRC:.c=.o)
-
+TEST_SRC = test_src/main.c
 ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
@@ -27,10 +27,10 @@ $(LIBRARY): $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
 
 %.o: %.c $(HEADER) $(LIBFT)
-	$(CC) $(CFLAGS) -c $< -I libft -I $(INC) -fPIC -o $@
+	$(CC) $(CFLAGS) -c $< -I libft -I $(INCLUDE) -fPIC -o $@
 
 $(LIBFT):
-	make -C libft
+	$(MAKE) -C libft
 	echo $@ created
 
 clean:
@@ -39,8 +39,8 @@ clean:
 
 
 
-test: $(LIBRARY) test_src/main.c
-	$(CC) $(CFLAGS) -o ./test test_src/main.c -I $(INC)  -I libft  -L libft -lft -L . -lmalloc
+test: $(LIBRARY) $(TEST_SRC) $(HEADER)
+	$(CC) $(CFLAGS) -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
 
 
 x: test
@@ -50,13 +50,13 @@ x: test
 
 
 unit: $(NAME)
-	$(CC) $(CFLAGS) -o test test_src/unit_test.c -I libft -L libft -lft -I $(INC) -L . -lmalloc
+	$(CC) $(CFLAGS) -o test test_src/unit_test.c -I libft -L libft -lft -I $(INCLUDE) -L . -lmalloc
 	@ulimit -n 4096
 	LD_LIBRARY_PATH=. ./test
 	rm -f test
 
 fclean: clean
-	make -C libft fclean
+	$(MAKE) -C libft fclean
 	rm -f $(LIBRARY) $(NAME)
 
 re: fclean all
