@@ -119,7 +119,7 @@ void *malloc(size_t size)
     {
         t_block *ptr = g_heap.tiny;
         int i = 0;
-        while (ptr && ptr->size == TINY)
+        while (size <= TINY && ptr && ptr->size == TINY)
         {
             i++;
             // print_tblock_header(*ptr);
