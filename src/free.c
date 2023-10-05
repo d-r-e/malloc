@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:14:16 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 18:53:13 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/05 19:17:14 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,14 @@ void free(void *ptr)
 
     block = (t_block *)ptr - 1;
     block->inuse = false;
+    
     if (block->size == LARGE)
     {
+        if (block->prev)
+            block->prev->next = block->next;
+        else
+            g_heap.large = block->next;
+        
         res = munmap((void *)block, sizeof(t_block) + block->size);
         if (res)
         {

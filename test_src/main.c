@@ -417,5 +417,5 @@ int main()
     test_mem_alignment();
     test_mem_alignment_extensive();
     test_malloc_with_double_arr_integers();
-    return 0;
+    show_alloc_mem();
 }

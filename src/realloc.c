@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/01 17:13:48 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 19:01:21 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/05 19:06:45 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void * realloc(void *mem, size_t size){
     void *dst;
-    t_block *block_ptr;
     
     if (!mem || size <= 0)
         return malloc(size);

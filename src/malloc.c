@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 18:14:19 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/05 19:36:25 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,14 @@ static int prealloc(void)
             tmp->next = NULL;
         tmp = tmp->next;
     }
+    tmp = g_heap.large;
+    g_heap.large = mmap(NULL, (sizeof(t_block) + LARGE) * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (g_heap.large == MAP_FAILED)
+    {
+        printf("mmap failed\n");
+        return -1;
+    }
+    initialize_block(g_heap.large, LARGE, sizeof(t_block) + LARGE, 0);
     // show_alloc_mem();
 //    show_alloc_mem_ex();
     return 0;
@@ -159,6 +167,14 @@ void *malloc(size_t size)
         {
             ft_putstr("error: mmap failed.\n");
             return NULL;
+        }
+        if (!g_heap.large)
+            g_heap.large = (t_block*)ptr;
+        else {
+            t_block *tmp = g_heap.large;
+            while (tmp->next)
+                tmp = tmp->next;
+            tmp->next = (t_block*)ptr;
         }
         return &((char *)ptr)[sizeof(t_block)];
     }

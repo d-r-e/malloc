@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 18:25:31 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/05 19:26:15 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void show_alloc_mem()
 {
     t_block *tmp = g_heap.tiny;
     printf("TINY : %p\n", (void *)tmp);
-    for (unsigned int i = 0; i < N_BLOCKS && tmp; i++)
+    for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i)
     {
         printf("%5d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),
@@ -47,11 +47,19 @@ void show_alloc_mem()
     }
     tmp = g_heap.small;
     printf("SMALL: %p\n", (void *)tmp);
-    for (unsigned int i = 0; i < N_BLOCKS && tmp; i++)
+    for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i)
     {
         printf("%5d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),
                (void *)((char *)tmp + sizeof(t_block) + SMALL),
+               tmp->size);
+        tmp = tmp->next;
+    }
+    tmp = g_heap.large;
+    for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i){
+        printf("%5d · %p - %p : %3lu bytes\n", i,
+               (void *)((char *)tmp + sizeof(t_block)),
+               (void *)((char *)tmp + sizeof(t_block) + LARGE),
                tmp->size);
         tmp = tmp->next;
     }
