@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/09/15 18:15:27 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/05 18:25:31 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,8 @@ static void hexdump(void *ptr, size_t size)
     }
 }
 
-/***
- * show_alloc_mem
- * This function is used to print the memory allocation of the pre-allocated blocks.
- */
+
+/// @brief Prints the memory blocks allocated in the heap.
 void show_alloc_mem()
 {
     t_block *tmp = g_heap.tiny;
@@ -59,10 +57,7 @@ void show_alloc_mem()
     }
 }
 
-/****
- * show_alloc_mem_ex
- * This function shows extra information (an hex dump of allocated memory)
- */
+/// @brief Prints the memory blocks allocated in the heap.
 void show_alloc_mem_ex()
 {
     t_block *tmp = NULL;
@@ -72,7 +67,7 @@ void show_alloc_mem_ex()
     printf("TINY : %p\n", (void *)tmp);
     while (tmp)
     {
-        ft_putstr(C_RED);
+        ft_putstr(RED);
         printf("%5d · %p - %p : %5lu bytes ", i,
                (void *)((char *)tmp + sizeof(t_block)),
                (void *)((char *)tmp + sizeof(t_block) + TINY),
@@ -82,14 +77,14 @@ void show_alloc_mem_ex()
         tmp = tmp->next;
         printf("\n");
         ++i;
-        ft_putstr(ENDC);
+        ft_putstr(RESET);
     }
     tmp = g_heap.small;
     printf("SMALL: %p\n", (void *)tmp);
     while (tmp)
     {
-        ft_putstr(CPRP);
-        printf(CPRP "%d · %p - %p : %5lu BYTES\n", i,
+        ft_putstr(PURPLE);
+        printf(PURPLE "%d · %p - %p : %5lu BYTES\n", i,
                (void *)((char *)tmp + sizeof(t_block)),
                (void *)((char *)tmp + sizeof(t_block) + SMALL),
                tmp->size);
@@ -97,7 +92,7 @@ void show_alloc_mem_ex()
             hexdump((void *)((char *)tmp + sizeof(t_block)), tmp->size);
         tmp = tmp->next;
         ++i;
-        ft_putstr(ENDC);
+        ft_putstr(RESET);
     }
 }
 

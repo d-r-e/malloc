@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
-/*   Updated: 2023/09/15 18:39:32 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/05 18:14:19 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void *malloc(size_t size)
     if (ret)
         return NULL;
     getrlimit(RLIMIT_AS, &limit);
-    if (size > limit.rlim_cur)
+    if (size > limit.rlim_cur || size < 0)
         return NULL;
     else if (size && size <= SMALL)
     {
@@ -165,7 +165,3 @@ void *malloc(size_t size)
     return NULL;
 }
 
-void *ft_realloc(void *ptr, size_t size)
-{
-    return realloc(ptr, size);
-}

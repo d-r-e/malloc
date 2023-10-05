@@ -48,7 +48,11 @@ x: test
 	@LD_LIBRARY_PATH=. ./test
 	@$(RM) ./test
 
+p: poetry
 
+poetry: $(NAME) test_src/poetry.c
+	$(CC) $(CFLAGS) -o ./test test_src/poetry.c -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
+	./test
 unit: $(NAME)
 	$(CC) $(CFLAGS) -o test test_src/unit_test.c -I libft -L libft -lft -I $(INCLUDE) -L . -lmalloc
 	@ulimit -n 4096
