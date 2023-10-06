@@ -14,6 +14,10 @@
 #define SMALL (TINY * 8)
 #define LARGE 4096 * 4
 
+// #define TINY 8
+// #define SMALL 16
+// #define LARGE 32
+
 #define N_BLOCKS 128
 
 #define FREE_ERROR_STRING "error: munmap: Could not free addressed memory."

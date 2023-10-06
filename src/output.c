@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 19:26:15 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/06 18:41:20 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ static void hexdump(void *ptr, size_t size)
 void show_alloc_mem()
 {
     t_block *tmp = g_heap.tiny;
+    unsigned long long total_size = 0;
+    
     printf("TINY : %p\n", (void *)tmp);
     for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i)
     {
@@ -42,7 +44,7 @@ void show_alloc_mem()
                (void *)((char *)tmp + sizeof(t_block)),
                (void *)((char *)tmp + sizeof(t_block) + TINY),
                tmp->size);
-
+        total_size += tmp->size;
         tmp = tmp->next;
     }
     tmp = g_heap.small;
@@ -56,6 +58,7 @@ void show_alloc_mem()
         tmp = tmp->next;
     }
     tmp = g_heap.large;
+    printf("LARGE: %p\n", (void *)tmp);
     for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i){
         printf("%5d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),

@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c

@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 19:36:25 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/06 18:39:14 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ static int prealloc(void)
     t_block *tmp = NULL;
     size_t tiny_tblock = sizeof(t_block) + TINY;
     size_t small_tblock = sizeof(t_block) + SMALL;
+    size_t large_block = sizeof(t_block) + LARGE;
 
     if (g_heap.tiny != NULL)
         return 0;
@@ -70,14 +71,16 @@ static int prealloc(void)
             tmp->next = NULL;
         tmp = tmp->next;
     }
-    tmp = g_heap.large;
     g_heap.large = mmap(NULL, (sizeof(t_block) + LARGE) * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (g_heap.large == MAP_FAILED)
+    initialize_block(g_heap.large, LARGE, large_block, 0);
+    tmp =g_heap.large->next;
+    for (i = 1; i < N_BLOCKS; i++)
     {
-        printf("mmap failed\n");
-        return -1;
+        initialize_block(tmp, LARGE, sizeof(t_block) + LARGE, i);
+        if (i == N_BLOCKS -1)
+            tmp->next = NULL;
+        tmp = tmp->next;
     }
-    initialize_block(g_heap.large, LARGE, sizeof(t_block) + LARGE, 0);
     // show_alloc_mem();
 //    show_alloc_mem_ex();
     return 0;
@@ -112,29 +115,27 @@ static int extend_heap(t_block *mem, size_t size){
 /// @return a pointer to memory or NULL in case of failure
 void *malloc(size_t size)
 {
-    void *ptr = NULL;
+    t_block *ptr = NULL;
     struct rlimit limit;
     int ret = 0;
 
     ret = prealloc();
     // show_alloc_mem_ex();
-    if (ret)
+    if (ret || size < 0)
         return NULL;
     getrlimit(RLIMIT_AS, &limit);
     if (size > limit.rlim_cur || size < 0)
         return NULL;
     else if (size && size <= SMALL)
     {
-        t_block *ptr = g_heap.tiny;
+        ptr = g_heap.tiny;
         int i = 0;
         while (size <= TINY && ptr && ptr->size == TINY)
         {
             i++;
-            // print_tblock_header(*ptr);
             if (ptr->inuse == false && size <= TINY)
             {
                 ptr->inuse = true;
-                // printf("FOUND TINY  i: %d %p\n", i, (void *)((char *)ptr + sizeof(t_block)));
                 return (void *)((char *)ptr + sizeof(t_block));
             }
             if (ptr->next == NULL)
@@ -161,6 +162,12 @@ void *malloc(size_t size)
     }
     else
     {
+        ptr = g_heap.large;
+        while (ptr){
+            if ( ptr->inuse)
+                return (void *)((char *)ptr + sizeof(t_block));
+            ptr = ptr->next;
+        }
         ptr = mmap(NULL, size + sizeof(t_block),
                    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (ptr == MAP_FAILED)

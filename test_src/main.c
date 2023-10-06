@@ -300,13 +300,13 @@ void test_memory_overwrite()
     }
 }
 
-void test_error(){
+void test_negative(){
     char *ptr;
-
+    int negative = -1 * get_random_number(1, 10000);
     printf("Testing negative values...\n");
 
-    ptr = malloc(-1);
-    if (ptr != NULL){
+    ptr = malloc(negative);
+    if (ptr == NULL){
         printf(GREEN "Malloc error -1 OK\n" RESET);
     } else {
         printf(RED "Malloc error -1 KO\n" RESET);
@@ -412,10 +412,10 @@ int main()
     test_integer_array();
     test_large_memory_copy();
     test_memory_overwrite();
-    test_error();
+    test_negative();
     test_zero();
     test_mem_alignment();
     test_mem_alignment_extensive();
     test_malloc_with_double_arr_integers();
-    show_alloc_mem();
+    // show_alloc_mem();
 }
