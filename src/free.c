@@ -6,19 +6,25 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:14:16 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/05 19:17:14 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/07 11:12:26 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <ft_malloc.h>
 
-void defragment_block(t_block *block){
-    t_block* ptr = block;
-
-    if (block->next && block->next->next){
-        (void)ptr;
-    }
+static void *disalign_memory(void *mem, size_t alignment)
+{
+    return (void *)((size_t)mem & ~(alignment - 1));
 }
+
+// static
+// void defragment_block(t_block *block){
+//     t_block* ptr = block;
+
+//     if (block->next && block->next->next){
+//         (void)ptr;
+//     }
+// }
 
 void free(void *ptr)
 {
@@ -26,6 +32,9 @@ void free(void *ptr)
     int res;
     unsigned int clear_blocks;
 
+    if (!ptr)
+        return;
+    ptr = disalign_memory(ptr, ALIGNMENT);
     block = (t_block *)ptr - 1;
     block->inuse = false;
     

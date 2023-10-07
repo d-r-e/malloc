@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/06 18:39:14 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/07 11:36:30 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 t_heap g_heap = {NULL, NULL, NULL};
 
-
-
+#ifdef FILL_MEMORY
 static char get_next_printable_char(char c)
 {
     while (!ft_isprint(c))
         c++;
     return c;
 }
+#endif
 
 static void initialize_block(t_block *block, size_t size, size_t tblock_size, int i)
 {
@@ -29,7 +29,13 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
     block->inuse = false;
     block->next = (t_block *)((char *)block + tblock_size);
     block->prev = (i > 0) ? (t_block *)((char *)block - tblock_size) : NULL;
-    ft_memset((void *)((char *)block + sizeof(t_block)), get_next_printable_char('B' + i), size);
+
+#ifdef FILL_MEMORY
+    char c = 'B' + i;
+    while (!ft_isprint(c))
+        c++:
+    ft_memset((void *)((char *)block + sizeof(t_block)), c, size);
+#endif
 }
 
 static int prealloc(void)
@@ -71,7 +77,12 @@ static int prealloc(void)
             tmp->next = NULL;
         tmp = tmp->next;
     }
-    g_heap.large = mmap(NULL, (sizeof(t_block) + LARGE) * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    g_heap.large = mmap(NULL, (sizeof(t_block) + LARGE), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (g_heap.large == MAP_FAILED)
+    {
+        printf("mmap failed\n");
+        return -1;
+    }
     initialize_block(g_heap.large, LARGE, large_block, 0);
     tmp =g_heap.large->next;
     for (i = 1; i < N_BLOCKS; i++)
@@ -87,6 +98,11 @@ static int prealloc(void)
 }
 
 
+/// @brief Adds a N_BLOCKS block of size SIZE to the appropriate
+///heap zone for SMALL and TINY sizes sets it to mem.next
+/// @param mem 
+/// @param size 
+/// @return 
 static int extend_heap(t_block *mem, size_t size){
     
     t_block *tmp = NULL;
@@ -109,6 +125,13 @@ static int extend_heap(t_block *mem, size_t size){
     return 0;
 }
 
+static
+void *get_aligned_pointer(void * mem, size_t alignment){
+    return (void *)(((size_t)mem + alignment - 1) & ~(alignment - 1));
+}
+
+
+
 
 /// @brief Well it's malloc!
 /// @param size bytes to allocate
@@ -119,12 +142,11 @@ void *malloc(size_t size)
     struct rlimit limit;
     int ret = 0;
 
-    ret = prealloc();
-    // show_alloc_mem_ex();
-    if (ret || size < 0)
-        return NULL;
     getrlimit(RLIMIT_AS, &limit);
-    if (size > limit.rlim_cur || size < 0)
+    if (size > limit.rlim_cur || size > M_MMAP_THRESHOLD)
+        return NULL;
+    ret = prealloc();
+    if (ret)
         return NULL;
     else if (size && size <= SMALL)
     {
@@ -136,7 +158,7 @@ void *malloc(size_t size)
             if (ptr->inuse == false && size <= TINY)
             {
                 ptr->inuse = true;
-                return (void *)((char *)ptr + sizeof(t_block));
+                return get_aligned_pointer((void *)((char *)ptr + sizeof(t_block)), ALIGNMENT);
             }
             if (ptr->next == NULL)
                 extend_heap(ptr, TINY);
@@ -152,7 +174,7 @@ void *malloc(size_t size)
                 if (ptr->inuse == false)
                 {
                     ptr->inuse = true;
-                    return (void *)((char *)ptr + sizeof(t_block));
+                    return get_aligned_pointer((void *)((char *)ptr + sizeof(t_block)), ALIGNMENT);
                 }
                 if (ptr->next == NULL)
                     extend_heap(ptr, SMALL);
@@ -172,7 +194,7 @@ void *malloc(size_t size)
                    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (ptr == MAP_FAILED)
         {
-            ft_putstr("error: mmap failed.\n");
+            ft_putstr(FREE_ERROR_STRING);
             return NULL;
         }
         if (!g_heap.large)

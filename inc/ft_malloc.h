@@ -9,18 +9,19 @@
 #include <sys/resource.h>
 #include <stdbool.h>
 #include <libft.h>
+#include <stdint.h>
+#define TINY (size_t)getpagesize() / 128
+#define SMALL (TINY * 4)
+#define LARGE (SMALL * 16)
 
-#define TINY (size_t)getpagesize()
-#define SMALL (TINY * 8)
-#define LARGE 4096 * 4
-
+#define ALIGNMENT 8
 // #define TINY 8
 // #define SMALL 16
 // #define LARGE 32
 
 #define N_BLOCKS 128
 
-#define FREE_ERROR_STRING "error: munmap: Could not free addressed memory."
+#define FREE_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
 #ifndef M_MMAP_THRESHOLD
 #define M_MMAP_THRESHOLD 128 * 1024

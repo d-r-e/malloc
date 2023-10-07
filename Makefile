@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address -fPIC 
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c
@@ -27,7 +27,7 @@ $(LIBRARY): $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
 
 %.o: %.c $(HEADER) $(LIBFT)
-	$(CC) $(CFLAGS) -c $< -I libft -I $(INCLUDE) -fPIC -o $@
+	$(CC) $(CFLAGS) -c $< -I libft -I $(INCLUDE) -o $@
 
 $(LIBFT):
 	$(MAKE) -C libft
@@ -42,6 +42,8 @@ clean:
 test: $(LIBRARY) $(TEST_SRC) $(HEADER)
 	$(CC) $(CFLAGS) -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
 
+test_malloc:  $(TEST_SRC)
+	$(CC) $(CFLAGS) -o ./test_malloc $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft 
 
 x: test
 	@ulimit -n 4096
@@ -58,6 +60,8 @@ unit: $(NAME)
 	@ulimit -n 4096
 	LD_LIBRARY_PATH=. ./test
 	rm -f test
+
+debug: test
 
 fclean: clean
 	$(MAKE) -C libft fclean

@@ -39,6 +39,7 @@ int main(void)
         modified_spl[i][len + 1] = '\0';
     }
     modified_spl[count] = NULL;
+    show_alloc_mem();
 
     tmp = spl;
     char **tmp_mod = modified_spl;
@@ -70,4 +71,5 @@ int main(void)
         tmp_mod++;
     }
     free(modified_spl);
+    show_alloc_mem();
 }
