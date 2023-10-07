@@ -59,12 +59,14 @@ void show_alloc_mem()
     }
     tmp = g_heap.large;
     printf("LARGE: %p\n", (void *)tmp);
-    for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i){
+    int i = 0;
+    while (tmp){
         printf("%5d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),
                (void *)((char *)tmp + sizeof(t_block) + LARGE),
                tmp->size);
         tmp = tmp->next;
+        ++i;
     }
 }
 

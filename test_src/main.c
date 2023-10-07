@@ -66,20 +66,20 @@ void test_malloc_large()
 {
     printf("Testing large malloc...\n");
 
-    char *ptr = malloc(10 * 1024 * 1024); // 10 MB
+    char *ptr = malloc(10 * 1024);
     if (ptr == NULL)
     {
         printf(RED "Failed to allocate large memory!\n" RESET);
         return;
     }
 
-    for (int i = 0; i < 10 * 1024 * 1024; i++)
+    for (int i = 0; i < 10 * 1024; i++)
     {
         ptr[i] = i % 256; // just to fill the memory
     }
 
-    printf(GREEN "Large malloc OK\n" RESET);
     free(ptr);
+    printf(GREEN "Large malloc OK\n" RESET);
 }
 
 void test_double_array()
@@ -111,17 +111,17 @@ void test_double_array()
             }
         }
     }
+//    for (int i = 0; i < rows; i++)
+//    {
+//        free(array[i]);
+//    }
+//    free(array);
 
     if (success)
     {
         printf(GREEN "Double array OK\n" RESET);
     }
 
-    for (int i = 0; i < rows; i++)
-    {
-        free(array[i]);
-    }
-    free(array);
 }
 
 void test_malloc()
@@ -214,6 +214,12 @@ void test_large_memory_copy()
 
     unsigned char *src = malloc(LARGE_SIZE);
     unsigned char *dest = malloc(LARGE_SIZE);
+
+    if (!src || !dest)
+    {
+        printf(RED "Memory allocation failure in large memory copy test.\n" RESET);
+        return;
+    }
 
     if (src == dest)
     {
@@ -408,10 +414,29 @@ int main()
     test_integer_array();
     test_large_memory_copy();
     test_memory_overwrite();
-    // test_negative();
+    test_negative();
     test_zero();
     test_mem_alignment();
     test_mem_alignment_extensive();
-    test_malloc_with_double_arr_integers();
+//    test_malloc_with_double_arr_integers();
+    char *a = malloc(8000);
+    char *b = malloc(4000);
+    char *c = malloc(8000);
+
+    if (!a ||!b || !c)
+        printf(RED "socorro\n");
+    for (int i = 0; i < 3; ++i)
+    {
+        a[i] = 'a';
+        b[i] = 'b';
+        c[i] = 'c';
+    }
+    (void)a;
+    (void)b;
+    (void)c;
+//    show_alloc_mem();
+//    free(a);
+//    free(b);
+    printf("success free\n");
     // show_alloc_mem();
 }

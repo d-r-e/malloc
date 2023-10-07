@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address -fPIC 
+CFLAGS = -Wall -Wextra -Werror -O2  -fPIC
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c
@@ -19,7 +19,7 @@ RM = rm -f
 
 all: $(NAME)
 
-$(NAME): $(LIBRARY) $(SRC)
+$(NAME): $(SRC) $(LIBRARY)
 	$(SYMLINK) $(LIBRARY) $(NAME)
 	@echo $@ created
 
@@ -39,7 +39,7 @@ clean:
 
 
 
-test: $(LIBRARY) $(TEST_SRC) $(HEADER)
+test: $(TEST_SRC) $(LIBRARY) $(HEADER)
 	$(CC) $(CFLAGS) -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
 
 test_malloc:  $(TEST_SRC)

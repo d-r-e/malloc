@@ -19,7 +19,7 @@
 // #define SMALL 16
 // #define LARGE 32
 
-#define N_BLOCKS 128
+#define N_BLOCKS 2
 
 #define FREE_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
