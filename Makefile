@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -fPIC
+CFLAGS = -Wall -Wextra -Werror -O2 -fPIC
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c

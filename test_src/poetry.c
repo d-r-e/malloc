@@ -71,5 +71,5 @@ int main(void)
         tmp_mod++;
     }
     free(modified_spl);
-    show_alloc_mem();
+//    show_alloc_mem();
 }

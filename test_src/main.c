@@ -4,6 +4,7 @@
 #include <libft.h>
 #include <time.h>
 #include <ft_malloc.h>
+#include <fcntl.h>
 
 #define MIN_ITER 2000
 #define MAX_ITER 500000
@@ -12,7 +13,6 @@
 #define LARGE_SIZE 100000000
 #define TEST_CASES 1000
 #define MAX_POINTERS 100
-
 void seed_rand()
 {
     srand(time(NULL));
@@ -206,6 +206,44 @@ void test_malloc_with_double_arr_integers()
         free(ptrs[i]);
     }
     free(ptrs);
+}
+
+void test_thousand_hundred_mallocs()
+{
+    printf("Testing thousand hundred mallocs...\n");
+
+    int **ptrs = malloc(sizeof(int *) * 100);
+    for (int i = 0; i < 100; ++i)
+    {
+        ptrs[i] = malloc(sizeof(int) * 1000);
+    }
+
+    for (int i = 0; i < 100; ++i)
+    {
+        free(ptrs[i]);
+    }
+    free(ptrs);
+
+    printf(GREEN "Thousand hundred mallocs OK\n" RESET);
+}
+
+void test_million_mallocs()
+{
+    printf("Testing million mallocs...\n");
+
+    int **ptrs = malloc(sizeof(int *) * 1000000);
+    for (int i = 0; i < 1000000; ++i)
+    {
+        ptrs[i] = malloc(sizeof(int) * 1000);
+    }
+
+    for (int i = 0; i < 1000000; ++i)
+    {
+        free(ptrs[i]);
+    }
+    free(ptrs);
+
+    printf(GREEN "Million mallocs OK\n" RESET);
 }
 
 void test_large_memory_copy()
@@ -406,6 +444,54 @@ void test_mem_alignment_extensive(void)
     }
 }
 
+void test_x(){
+    printf("Testing x...\n");
+
+    char *a = malloc(8000);
+    char *b = malloc(4000);
+    char *c = malloc(8000);
+
+    if (!a ||!b || !c)
+        printf(RED "Memory allocation error\n" RESET);
+    for (int i = 0; i < 3; ++i)
+    {
+        a[i] = 'a';
+        b[i] = 'b';
+        c[i] = 'c';
+    }
+//    show_alloc_mem();
+    free(a);
+    free(b);
+    free(c);
+    printf(GREEN "Test x OK\n" RESET);
+}
+
+void test_alloc_100MB_file(){
+    system("dd if=/dev/zero of=100MB bs=1048576 count=100");
+    int fd = open("100MB", O_RDONLY);
+    if (fd == -1)
+    {
+        printf(RED "Error opening file\n" RESET);
+        exit(1);
+    }
+    printf(GREEN "File opened\n" RESET);
+    char *ptr = malloc(100000000);
+    if (!ptr)
+    {
+        printf(RED "Memory allocation error\n" RESET);
+        exit(1);
+    }
+    printf(GREEN "Memory allocated .. " RESET);
+    read(fd, ptr, 100000000);
+    printf(GREEN "File read .. "  RESET);
+    free(ptr);
+    printf(GREEN "Memory freed .. " RESET);
+    close(fd);
+    printf(GREEN "File closed .. " RESET);
+    system("rm 100MB");
+    printf(GREEN "File deleted\n" RESET);
+}
+
 int main()
 {
     test_malloc_small();
@@ -418,44 +504,10 @@ int main()
     test_zero();
     test_mem_alignment();
     test_mem_alignment_extensive();
-//    test_malloc_with_double_arr_integers();
-    char *a = malloc(8000);
-    char *b = malloc(4000);
-    char *c = malloc(8000);
-
-    if (!a ||!b || !c)
-        printf(RED "socorro\n");
-    for (int i = 0; i < 3; ++i)
-    {
-        a[i] = 'a';
-        b[i] = 'b';
-        c[i] = 'c';
-    }
-//    show_alloc_mem();
-    free(a);
-    free(b);
-    free(c);
-
-
-//    int **million;
-//    million = malloc(sizeof(int *) * 1000000);
-//    if (!million){
-//
-//        printf(RED "socorro\n");
-//        exit(1);
-//    }
-//    for (int i = 0; i < 1000000; i++)
-//    {
-//        million[i] = malloc(sizeof(int) * 1000);
-//        for (int j = 0; j < 1000; j++)
-//        {
-//            million[i][j] = i + j;
-//        }
-//    }
-//    for (int i = 0; i < 1000000; i++)
-//    {
-//        free(million[i]);
-//    }
-
-
+    test_malloc_with_double_arr_integers();
+    test_thousand_hundred_mallocs();
+//    test_million_mallocs();
+    test_x();
+    test_alloc_100MB_file();
+    return 0;
 }
