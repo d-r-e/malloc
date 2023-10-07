@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <libft.h>
 #include <stdint.h>
-#define TINY (size_t)getpagesize() / 128
+#define TINY (size_t)4096 / 128
 #define SMALL (TINY * 4)
 #define LARGE (SMALL * 16)
 
@@ -19,7 +19,7 @@
 // #define SMALL 16
 // #define LARGE 32
 
-#define N_BLOCKS 2
+#define N_BLOCKS 128
 
 #define FREE_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 

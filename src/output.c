@@ -49,7 +49,7 @@ void show_alloc_mem()
     }
     tmp = g_heap.small;
     printf("SMALL: %p\n", (void *)tmp);
-    for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i)
+    for(unsigned int i  =0; tmp; ++i)
     {
         printf("%5d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),

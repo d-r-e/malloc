@@ -431,12 +431,31 @@ int main()
         b[i] = 'b';
         c[i] = 'c';
     }
-    (void)a;
-    (void)b;
-    (void)c;
 //    show_alloc_mem();
-//    free(a);
-//    free(b);
-    printf("success free\n");
-    // show_alloc_mem();
+    free(a);
+    free(b);
+    free(c);
+
+
+//    int **million;
+//    million = malloc(sizeof(int *) * 1000000);
+//    if (!million){
+//
+//        printf(RED "socorro\n");
+//        exit(1);
+//    }
+//    for (int i = 0; i < 1000000; i++)
+//    {
+//        million[i] = malloc(sizeof(int) * 1000);
+//        for (int j = 0; j < 1000; j++)
+//        {
+//            million[i][j] = i + j;
+//        }
+//    }
+//    for (int i = 0; i < 1000000; i++)
+//    {
+//        free(million[i]);
+//    }
+
+
 }
