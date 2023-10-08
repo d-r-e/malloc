@@ -24,7 +24,7 @@
 
 # define TINY 8
 # define SMALL 32
-# define LARGE 4096
+# define LARGE 1024
 
 # define ALIGNMENT 8
 
@@ -34,9 +34,7 @@
 
 # define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
-# ifndef M_MMAP_THRESHOLD
-#  define M_MMAP_THRESHOLD 131072
-# endif
+
 
 # define BLUE "\e[1;34m"
 # define GREEN "\033[32m"

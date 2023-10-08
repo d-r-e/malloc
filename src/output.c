@@ -107,6 +107,22 @@ void show_alloc_mem_ex()
         ++i;
         ft_putstr(RESET);
     }
+	tmp = g_heap.large;
+	printf("LARGE: %p\n", (void *)tmp);
+	while (tmp)
+	{
+		ft_putstr(GREEN);
+		printf("%5d · %p - %p : %5lu bytes ", i,
+			   (void *)((char *)tmp + sizeof(t_block)),
+			   (void *)((char *)tmp + sizeof(t_block) + LARGE),
+			   tmp->size);
+		if (tmp->size > 0)
+			hexdump((void *)((char *)tmp + sizeof(t_block)), tmp->size);
+		tmp = tmp->next;
+		printf("\n");
+		++i;
+		ft_putstr(RESET);
+	}
 }
 
 void print_tblock_header(t_block block)
