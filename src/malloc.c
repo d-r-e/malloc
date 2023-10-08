@@ -124,8 +124,7 @@ static int extend_heap(t_block *mem, size_t size) {
     return 0;
 }
 
-static
-void *get_aligned_pointer(void *mem, size_t alignment) {
+static void *get_aligned_pointer(void *mem, size_t alignment) {
     return (void *) (((size_t) mem + alignment - 1) & ~(alignment - 1));
 }
 
@@ -146,9 +145,7 @@ void *malloc(size_t size) {
         return NULL;
     else if (size && size <= SMALL) {
         ptr = g_heap.tiny;
-        int i = 0;
         while (size <= TINY && ptr && ptr->size == TINY) {
-            i++;
             if (ptr->inuse == false && size <= TINY) {
                 ptr->inuse = true;
                 return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
@@ -159,9 +156,7 @@ void *malloc(size_t size) {
         }
         if (size > TINY && size <= SMALL) {
             ptr = g_heap.small;
-            i = 0;
             while (ptr && ptr->size == SMALL && size <= SMALL) {
-                i++;
                 if (ptr->inuse == false) {
                     ptr->inuse = true;
                     return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);

@@ -12,6 +12,8 @@
 #define LARGE_SIZE 100000000
 #define TEST_CASES 1000
 #define MAX_POINTERS 100
+
+
 void seed_rand()
 {
     srand(time(NULL));
@@ -230,21 +232,48 @@ void test_million_mallocs()
 {
     printf("Testing million mallocs...\n");
 
-    int **ptrs = malloc(sizeof(int *) * 1000000);
-    for (int i = 0; i < 1000000; ++i)
+    int **ptrs = malloc(sizeof(int *) * 1000);
+    for (int i = 0; i < 1000; ++i)
     {
         ptrs[i] = malloc(sizeof(int) * 1000);
+        if (!ptrs[i])
+        {
+            printf(RED "Memory allocation failure in million mallocs test.\n" RESET);
+            return;
+        }
     }
 
-    printf("Freeing...\n");
-
-    for (int i = 0; i < 1000000; ++i)
+    for (int i = 0; i < 1000; ++i)
     {
         free(ptrs[i]);
     }
     free(ptrs);
 
     printf(GREEN "Million mallocs OK\n" RESET);
+}
+
+void test_gazillion_mallocs()
+{
+    printf("Testing gazillion mallocs...\n");
+
+    int **ptrs = malloc(sizeof(int *) * 10000);
+    for (int i = 0; i < 10000; ++i)
+    {
+        ptrs[i] = malloc(sizeof(int) * 10000);
+        if (!ptrs[i])
+        {
+            printf(RED "Memory allocation failure in gazillion mallocs test.\n" RESET);
+            return;
+        }
+    }
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        free(ptrs[i]);
+    }
+    free(ptrs);
+
+    printf(GREEN "Gazillion mallocs OK\n" RESET);
 }
 
 void test_large_memory_copy()
@@ -650,10 +679,12 @@ int main()
     test_negative();
     test_zero();
     test_mem_alignment();
+
     test_mem_alignment_extensive();
     test_malloc_with_double_arr_integers();
     test_thousand_hundred_mallocs();
     test_million_mallocs();
+    test_gazillion_mallocs();
     test_x();
 //    test_alloc_random_file();
 

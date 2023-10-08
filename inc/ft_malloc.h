@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_malloc.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/02 00:42:42 by darodrig          #+#    #+#             */
+/*   Updated: 2023/10/08 13:31:01 by darodrig         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_MALLOC_H
 #define FT_MALLOC_H
 
@@ -19,7 +31,7 @@
 // #define SMALL 16
 // #define LARGE 32
 
-# define N_BLOCKS 4
+# define N_BLOCKS 128
 
 # define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
