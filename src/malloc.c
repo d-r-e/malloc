@@ -28,7 +28,6 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
 		block->next = (t_block *) ((char *) block + tblock_size);
 		block->prev = (i > 0) ? (t_block *) ((char *) block - tblock_size) : NULL;
 	}
-	//        block->next = NULL;
 }
 
 static int prealloc(void) {
@@ -41,13 +40,12 @@ static int prealloc(void) {
 	if (g_heap.tiny != NULL)
 		return 0;
 	else {
-		g_heap.tiny = mmap(NULL, (sizeof(t_block) + TINY) * N_BLOCKS, PROT_READ | PROT_WRITE,
+		g_heap.tiny = mmap(NULL, tiny_tblock * N_BLOCKS, PROT_READ | PROT_WRITE,
 						   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.tiny == MAP_FAILED) {
 			printf("mmap failed\n");
 			return -1;
 		}
-		// TINY
 		tmp = g_heap.tiny;
 		for (i = 0; i < N_BLOCKS; i++) {
 			initialize_block(tmp, TINY, tiny_tblock, i);
@@ -56,7 +54,7 @@ static int prealloc(void) {
 			tmp = tmp->next;
 		}
 	}
-	g_heap.small = mmap(NULL, (sizeof(t_block) + SMALL) * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+	g_heap.small = mmap(NULL, small_tblock * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 						-1, 0);
 	if (g_heap.small == MAP_FAILED) {
 		printf("mmap failed\n");
@@ -165,14 +163,15 @@ void *malloc(size_t size) {
 			}
 		}
 	} else {
-		unsigned int i = 0;
 		ptr = g_heap.large;
 		while (ptr) {
 			if (ptr->inuse == false && size <= ptr->size) {
 				ptr->inuse = true;
+#ifdef MALLOC_DEBUG
+				printf("malloc found block: %p\n", &ptr);
+#endif
 				return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
 			}
-			++i;
 			if (ptr->next)
 				ptr = ptr->next;
 			else
@@ -189,6 +188,9 @@ void *malloc(size_t size) {
 		ptr->next = new_block;
 		new_block->prev = ptr;
 		new_block->next = NULL;
+#ifdef MALLOC_DEBUG
+		printf("malloc found block: %p\n", &new_block);
+#endif
 		return get_aligned_pointer((void *) ((char *) new_block + sizeof(t_block)), ALIGNMENT);
 	}
 	return NULL;

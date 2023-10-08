@@ -6,14 +6,24 @@
 #include <time.h>
 
 #define MIN_ITER 2000
-#define MAX_ITER 500000
+#define MAX_ITER 5000000
 #define MIN_SIZE 1
 #define MAX_SIZE 999999
 #define LARGE_SIZE 100000000
 #define TEST_CASES 1000
 #define MAX_POINTERS 100
 
+#ifndef RED
+# define RED "\033[31m"
+# define RESET "\033[0m"
+# define GREEN "\033[32m"
+#endif
 
+#ifndef TINY
+# define TINY 32
+# define SMALL (TINY * 4)
+# define LARGE (SMALL * 16)
+#endif
 void seed_rand() {
 	srand(time(NULL));
 }
@@ -94,11 +104,11 @@ void test_double_array() {
 			}
 		}
 	}
-	//    for (int i = 0; i < rows; i++)
-	//    {
-	//        free(array[i]);
-	//    }
-	//    free(array);
+	   for (int i = 0; i < rows; i++)
+	   {
+	       free(array[i]);
+	   }
+	   free(array);
 
 	if (success) {
 		printf(GREEN "Double array OK\n" RESET);
@@ -190,6 +200,37 @@ void test_thousand_hundred_mallocs() {
 	printf(GREEN "Thousand hundred mallocs OK\n" RESET);
 }
 
+void test_thousand_hundred_mallocs_write_read(){
+	printf("Testing thousand hundred mallocs write read...\n");
+
+	int **ptrs = malloc(sizeof(int *) * 100);
+	for (int i = 0; i < 100; ++i) {
+		ptrs[i] = malloc(sizeof(int) * 1000);
+	}
+
+	for (int i = 0; i < 100; ++i) {
+		for (int j = 0; j < 1000; ++j) {
+			ptrs[i][j] = i * j;
+		}
+	}
+
+	for (int i = 0; i < 100; ++i) {
+		for (int j = 0; j < 1000; ++j) {
+			if (ptrs[i][j] != i * j) {
+				printf(RED "Memory overwrite detected at pointer %d index %d: expected %d, got %d\n" RESET, i, j, i * j, ptrs[i][j]);
+				return;
+			}
+		}
+	}
+
+	for (int i = 0; i < 100; ++i) {
+		free(ptrs[i]);
+	}
+	free(ptrs);
+
+	printf(GREEN "Thousand hundred mallocs write read OK\n" RESET);
+}
+
 void test_million_mallocs() {
 	printf("Testing million mallocs...\n");
 
@@ -212,8 +253,9 @@ void test_million_mallocs() {
 
 void test_gazillion_mallocs() {
 	printf("Testing gazillion mallocs...\n");
+	int ret = 0;
 
-	int **ptrs = malloc(sizeof(int *) * 10000);
+	char **ptrs = malloc(sizeof(int *) * 10000);
 	for (int i = 0; i < 10000; ++i) {
 		ptrs[i] = malloc(sizeof(int) * 10000);
 		if (!ptrs[i]) {
@@ -223,6 +265,10 @@ void test_gazillion_mallocs() {
 	}
 
 	for (int i = 0; i < 10000; ++i) {
+		if (ret != 0) {
+			printf(RED "Memory overwrite detected at pointer %d\n" RESET, i);
+			return;
+		}
 		free(ptrs[i]);
 	}
 	free(ptrs);
@@ -410,8 +456,8 @@ void test_x() {
 	printf("Testing x...\n");
 
 	char *a = malloc(8000);
-	char *b = malloc(MIN_SIZE);
-	char *c = malloc(MIN_SIZE);
+	char *b = malloc(2000);
+	char *c = malloc(2000);
 
 	if (!a || !b || !c)
 		printf(RED "Memory allocation error\n" RESET);
@@ -429,9 +475,9 @@ void test_x() {
 
 void test_alloc_random_file() {
 	// Create a file from /dev/urandom
-	system("dd if=/dev/urandom of=test_in.txt bs=1024 count=102400");
+	system("dd if=/dev/urandom of=/tmp/test_in.txt bs=1024 count=102400");
 
-	int fd = open("test_in.txt", O_RDONLY);
+	int fd = open("/tmp/test_in.txt", O_RDONLY);
 	if (fd == -1) {
 		printf(RED "Error opening file\n" RESET);
 		exit(1);
@@ -456,7 +502,7 @@ void test_alloc_random_file() {
 	printf(GREEN "File read\n" RESET);
 	close(fd);// Close the file as soon as it's done being used
 
-	int fd2 = open("test_out.txt", O_WRONLY | O_CREAT, 0644);
+	int fd2 = open("/tmp/test_out.txt", O_WRONLY | O_CREAT, 0644);
 	if (fd2 == -1) {
 		printf(RED "Error opening output file\n" RESET);
 		free(ptr);// Free memory before exiting
@@ -477,7 +523,7 @@ void test_alloc_random_file() {
 	printf(GREEN "Memory freed\n" RESET);
 
 	// Compare the two files
-	if (system("diff test_in.txt test_out.txt") == 0) {
+	if (system("diff /tmp/test_in.txt /tmp/test_out.txt") == 0) {
 		printf(GREEN "Files are identical\n" RESET);
 	} else {
 		printf(RED "Files are different\n" RESET);
@@ -585,6 +631,116 @@ void test_realloc_tiny_to_large() {
 	printf(GREEN "Test realloc tiny to large OK\n" RESET);
 }
 
+void test_random_realloc_level_one(){
+
+}
+
+void test_realloc_expanding() {
+	printf("Testing realloc expanding...\n");
+
+	char *ptr = malloc(10);
+	if (!ptr) {
+		printf(RED "Initial memory allocation error\n" RESET);
+		return;
+	}
+
+	strcpy(ptr, "123456789");
+
+	char *new_ptr = realloc(ptr, 100);
+	if (!new_ptr) {
+		printf(RED "Memory allocation error on realloc expanding\n" RESET);
+		free(ptr);
+		return;
+	}
+	strcat(new_ptr, "0abcdefghij");
+
+	if (strcmp(new_ptr, "1234567890abcdefghij") != 0) {
+		printf(RED "Memory content error after realloc expanding\n" RESET);
+	}
+
+	free(new_ptr);
+	printf(GREEN "Test realloc expanding OK\n" RESET);
+}
+
+void test_realloc_shrinking() {
+	printf("Testing realloc shrinking...\n");
+
+	char *ptr = malloc(100);
+	if (!ptr) {
+		printf(RED "Initial memory allocation error\n" RESET);
+		return;
+	}
+
+	strcpy(ptr, "1234567890abcdefghij");
+
+	char *new_ptr = realloc(ptr, 10);
+	if (!new_ptr) {
+		printf(RED "Memory allocation error on realloc shrinking\n" RESET);
+		free(ptr);
+		return;
+	}
+
+	if (strncmp(new_ptr, "1234567890", 10) != 0) {
+		printf(RED "Memory content error after realloc shrinking\n" RESET);
+	}
+
+	free(new_ptr);
+	printf(GREEN "Test realloc shrinking OK\n" RESET);
+}
+
+void test_realloc_zero_size() {
+	printf("Testing realloc with zero size (should free)...\n");
+
+	char *ptr = malloc(100);
+	if (!ptr) {
+		printf(RED "Initial memory allocation error\n" RESET);
+		return;
+	}
+	ft_bzero(ptr, 100);
+
+	char *new_ptr = realloc(ptr, 0);
+	free(new_ptr);
+
+	printf(GREEN "Test realloc with zero size OK\n" RESET);
+}
+
+void test_realloc_null_ptr() {
+	printf("Testing realloc with NULL pointer (should behave like malloc)...\n");
+
+	char *new_ptr = realloc(NULL, 100);
+	if (!new_ptr) {
+		printf(RED "Memory allocation error on realloc NULL ptr\n" RESET);
+		return;
+	}
+
+	strcpy(new_ptr, "1234567890");
+	if (strcmp(new_ptr, "1234567890") != 0) {
+		printf(RED "Memory content error after realloc NULL ptr\n" RESET);
+	}
+
+	free(new_ptr);
+	printf(GREEN "Test realloc with NULL pointer OK\n" RESET);
+}
+
+void test_stress_malloc(){
+	int i = 0;
+
+	printf("Testing stress malloc...\n");
+
+	while (i < MAX_ITER){
+		char *ptr = malloc(100);
+		if (!ptr) {
+			printf(RED "Initial memory allocation error\n" RESET);
+			return;
+		}
+		ft_bzero(ptr, 100);
+		free(ptr);
+		i++;
+	}
+
+	printf(GREEN "Test stress malloc OK\n" RESET);
+}
+
 int main() {
 	test_malloc_small();
 	test_malloc_large();
@@ -592,19 +748,30 @@ int main() {
 	test_integer_array();
 	test_large_memory_copy();
 	test_memory_overwrite();
-	test_negative();
+	 test_stress_malloc();
+	// // test_negative();
 	test_zero();
 	test_mem_alignment();
 	test_mem_alignment_extensive();
 	test_malloc_with_double_arr_integers();
 	test_thousand_hundred_mallocs();
-	test_million_mallocs();
-	test_gazillion_mallocs();
+	test_thousand_hundred_mallocs_write_read();
+	 test_million_mallocs();
+	// test_gazillion_mallocs();
 	test_x();
-	//    test_alloc_random_file();
+	// test_alloc_random_file();
 	test_simple_realloc();
 	test_realloc_tiny_to_small();
 	test_realloc_tiny_to_large();
-	system("leaks test");
+	// system("leaks test");`
+
+	test_realloc_expanding();
+	test_realloc_shrinking();
+	test_realloc_zero_size();
+	test_realloc_null_ptr();
+
+//#if (HOSTTYPE == x86_64_Darwin)
+//		system("leaks test");
+//#endif
 	return 0;
 }

@@ -23,7 +23,7 @@ void *realloc(void *mem, size_t size) {
 	t_block *tmp;
 
 	if (!mem)
-		return NULL;
+		return malloc(size);
 	actual_mem = disalign_memory(mem, ALIGNMENT);
 	tmp = (t_block *) actual_mem - 1;
 	if (tmp->size != SMALL && tmp->size != TINY && tmp->size < LARGE)

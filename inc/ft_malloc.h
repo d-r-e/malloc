@@ -11,41 +11,38 @@
 /* ************************************************************************** */
 
 #ifndef FT_MALLOC_H
-#define FT_MALLOC_H
+# define FT_MALLOC_H
 
-#include <libft.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <sys/resource.h>
-#include <unistd.h>
+# include <libft.h>
+# include <stdbool.h>
+# include <stdint.h>
+# include <stdio.h>
+# include <string.h>
+# include <sys/mman.h>
+# include <sys/resource.h>
+# include <unistd.h>
 
-#define TINY 32
-#define SMALL 128
-#define LARGE 2048
+# define TINY 32
+# define SMALL 128
+# define LARGE 2048
 
-#define ALIGNMENT 8
-// #define TINY 8
-// #define SMALL 16
-// #define LARGE 32
+# define ALIGNMENT 8
 
-#ifndef N_BLOCKS
-#define N_BLOCKS 128
-#endif
+# ifndef N_BLOCKS
+#  define N_BLOCKS 128
+# endif
 
-#define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
+# define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
-#ifndef M_MMAP_THRESHOLD
-#define M_MMAP_THRESHOLD 131072
-#endif
+# ifndef M_MMAP_THRESHOLD
+#  define M_MMAP_THRESHOLD 131072
+# endif
 
-#define BLUE "\e[1;34m"
-#define GREEN "\033[32m"
-#define RED "\033[31m"
-#define RESET "\033[0m"
-#define PURPLE "\e[1;35m"
+# define BLUE "\e[1;34m"
+# define GREEN "\033[32m"
+# define RED "\033[31m"
+# define RESET "\033[0m"
+# define PURPLE "\e[1;35m"
 
 /* TYPES AND STRUCTS */
 typedef struct s_block {

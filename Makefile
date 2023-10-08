@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -O2 -fPIC -g3
+CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -DHOSTTYPE="$(HOSTTYPE)"
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c src/realloc.c
@@ -19,11 +19,11 @@ RM = rm -f
 
 all: $(NAME)
 
-$(NAME): $(SRC) $(LIBRARY) Makefile
-	$(SYMLINK) $(LIBRARY) $(NAME)
+$(NAME): $(SRC) $(LIBRARY)
+	$(SYMLINK)  $(LIBRARY) $(NAME)
 	@echo $@ created
 
-$(LIBRARY): $(OBJ) $(LIBFT)
+$(LIBRARY): $(OBJ) $(LIBFT) Makefile
 	$(CC) $(CFLAGS) -shared -o $@ $(OBJ) $(LIBFT)
 
 %.o: %.c $(HEADER) $(LIBFT)
@@ -34,16 +34,25 @@ $(LIBFT):
 	echo $@ created
 
 clean:
-	$(MAKE) -C libft clean
+	$(MAKE) -C libft clean			
 	$(RM) $(OBJ)
 
 
 
-test: $(TEST_SRC) $(LIBRARY) $(HEADER)
+test: $(TEST_SRC) $(NAME) $(HEADER)
 	$(CC) $(CFLAGS) -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
 
 test_malloc:  $(TEST_SRC)
 	$(CC) $(CFLAGS) -o ./test_malloc $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft 
+
+test_system_malloc:  $(TEST_SRC)
+	$(CC) $(CFLAGS) -o ./test_system_malloc $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft
+
+time: test_malloc test_system_malloc
+	@echo "malloc and system malloc on silent subshells"
+	@time -p ./test_malloc
+	@time -p ./test_system_malloc
+
 
 x: test
 	@ulimit -n 4096
@@ -69,4 +78,11 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+v: valgrind
+
+valgrind: $(NAME) test
+	LD_LIBRARY_PATH=. valgrind ./test
+
+
+
+.PHONY: all clean fclean re time x test_system_malloc unit debug valgrind
