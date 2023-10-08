@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <libft.h>
 #include <time.h>
@@ -448,8 +447,8 @@ void test_x(){
     printf("Testing x...\n");
 
     char *a = malloc(8000);
-    char *b = malloc(4000);
-    char *c = malloc(8000);
+    char *b = malloc(MIN_SIZE);
+    char *c = malloc(MIN_SIZE);
 
     if (!a ||!b || !c)
         printf(RED "Memory allocation error\n" RESET);
@@ -466,30 +465,126 @@ void test_x(){
     printf(GREEN "Test x OK\n" RESET);
 }
 
-void test_alloc_100MB_file(){
-    system("dd if=/dev/zero of=100MB bs=1048576 count=100");
-    int fd = open("100MB", O_RDONLY);
+void test_alloc_random_file()
+{
+    // Create a file from /dev/urandom
+    system("dd if=/dev/urandom of=test_in.txt bs=1024 count=102400");
+
+    int fd = open("test_in.txt", O_RDONLY);
     if (fd == -1)
     {
         printf(RED "Error opening file\n" RESET);
         exit(1);
     }
     printf(GREEN "File opened\n" RESET);
-    char *ptr = malloc(100000000);
+
+    char *ptr = malloc(1024 * 1024 * 100);
     if (!ptr)
     {
         printf(RED "Memory allocation error\n" RESET);
+        close(fd); // Close the file before exiting
         exit(1);
     }
-    printf(GREEN "Memory allocated .. " RESET);
-    read(fd, ptr, 100000000);
-    printf(GREEN "File read .. "  RESET);
+    printf(GREEN "Memory allocated\n" RESET);
+
+    ssize_t bytesRead = read(fd, ptr, 1024 * 1024 * 100);
+    if (bytesRead == -1)
+    {
+        printf(RED "Error reading from file\n" RESET);
+        free(ptr);
+        close(fd);
+        exit(1);
+    }
+    printf(GREEN "File read\n" RESET);
+    close(fd); // Close the file as soon as it's done being used
+
+    int fd2 = open("test_out.txt", O_WRONLY | O_CREAT, 0644);
+    if (fd2 == -1)
+    {
+        printf(RED "Error opening output file\n" RESET);
+        free(ptr); // Free memory before exiting
+        exit(1);
+    }
+
+    ssize_t bytesWritten = write(fd2, ptr, bytesRead);
+    if (bytesWritten == -1 || bytesWritten != bytesRead)
+    {
+        printf(RED "Error writing to output file\n" RESET);
+        free(ptr);
+        close(fd2);
+        exit(1);
+    }
+    printf(GREEN "File written\n" RESET);
+    close(fd2); // Close the output file
+
     free(ptr);
-    printf(GREEN "Memory freed .. " RESET);
-    close(fd);
-    printf(GREEN "File closed .. " RESET);
-    system("rm 100MB");
-    printf(GREEN "File deleted\n" RESET);
+    printf(GREEN "Memory freed\n" RESET);
+
+    // Compare the two files
+    if (system("diff test_in.txt test_out.txt") == 0)
+    {
+        printf(GREEN "Files are identical\n" RESET);
+    }
+    else
+    {
+        printf(RED "Files are different\n" RESET);
+    }
+}
+
+void test_simple_realloc()
+{
+    printf("Testing simple realloc...\n");
+
+    char *ptr_1;
+    char *ptr_2;
+    char *ptr_3;
+    char *ptr_4;
+
+    ptr_1 = malloc(1);
+    ptr_2 = malloc(1);
+    ptr_3 = malloc(1);
+    ptr_4 = malloc(1);
+
+    ptr_1 = realloc(ptr_1, 2);
+    ptr_2 = realloc(ptr_2, 2);
+    ptr_3 = realloc(ptr_3, 2);
+    ptr_4 = realloc(ptr_4, 2);
+
+    if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
+        printf(RED "Memory allocation error\n" RESET);
+    free(ptr_1);
+    free(ptr_2);
+    free(ptr_3);
+    free(ptr_4);
+    printf(GREEN "Test simple realloc OK\n" RESET);
+}
+
+void test_realloc_tiny_to_small()
+{
+    printf("Testing realloc tiny to small...\n");
+
+    char *ptr_1;
+    char *ptr_2;
+    char *ptr_3;
+    char *ptr_4;
+
+    ptr_1 = malloc(TINY -1);
+    ptr_2 = malloc(TINY -1);
+    ptr_3 = malloc(TINY -1);
+    ptr_4 = malloc(TINY -1);
+
+    ptr_1 = realloc(ptr_1, SMALL);
+    ptr_2 = realloc(ptr_2, SMALL);
+    ptr_3 = realloc(ptr_3, SMALL);
+    ptr_4 = realloc(ptr_4, SMALL);
+
+    if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
+        printf(RED "Memory allocation error\n" RESET);
+    free(ptr_1);
+    free(ptr_2);
+    free(ptr_3);
+    free(ptr_4);
+    printf(GREEN "Test realloc tiny to small OK\n" RESET);
 }
 
 int main()
@@ -508,6 +603,9 @@ int main()
     test_thousand_hundred_mallocs();
 //    test_million_mallocs();
     test_x();
-    test_alloc_100MB_file();
+//    test_alloc_random_file();
+
+    test_simple_realloc();
+    test_realloc_tiny_to_small();
     return 0;
 }

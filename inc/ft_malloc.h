@@ -3,14 +3,14 @@
 
 #include <sys/mman.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/resource.h>
 #include <stdbool.h>
 #include <libft.h>
 #include <stdint.h>
-#define TINY (size_t)4096 / 128
+
+#define TINY (size_t)32
 #define SMALL (TINY * 4)
 #define LARGE (SMALL * 16)
 
@@ -19,9 +19,9 @@
 // #define SMALL 16
 // #define LARGE 32
 
-#define N_BLOCKS 256
+#define N_BLOCKS 8
 
-#define FREE_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
+#define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
 #ifndef M_MMAP_THRESHOLD
 #define M_MMAP_THRESHOLD 128 * 1024

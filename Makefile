@@ -1,7 +1,7 @@
-CFLAGS = -Wall -Wextra -Werror -O2 -fPIC
+CFLAGS = -Wall -Wextra -Werror -fPIC -g3
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
-SRC = src/malloc.c src/output.c src/free.c
+SRC = src/malloc.c src/output.c src/free.c src/realloc.c
 INCLUDE = inc
 HEADER = inc/ft_malloc.h
 OBJ = $(SRC:.c=.o)
@@ -19,7 +19,7 @@ RM = rm -f
 
 all: $(NAME)
 
-$(NAME): $(SRC) $(LIBRARY)
+$(NAME): $(SRC) $(LIBRARY) Makefile
 	$(SYMLINK) $(LIBRARY) $(NAME)
 	@echo $@ created
 

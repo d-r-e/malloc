@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/07 11:36:30 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/08 11:14:24 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,7 @@ void *malloc(size_t size) {
         t_block *new_block = mmap(NULL, size + sizeof(t_block),
                                   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (new_block == MAP_FAILED) {
-            ft_putstr(FREE_ERROR_STRING);
+            ft_putstr(MUNMAP_ERROR_STRING);
             return NULL;
         }
         new_block->inuse = true;
