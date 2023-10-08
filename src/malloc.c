@@ -37,7 +37,7 @@ static int prealloc(void) {
     t_block *tmp = NULL;
     size_t tiny_tblock = sizeof(t_block) + TINY;
     size_t small_tblock = sizeof(t_block) + SMALL;
-    size_t large_block = sizeof(t_block) + LARGE;
+    size_t large_block = sizeof(t_block) + LARGE + ALIGNMENT;
 
     if (g_heap.tiny != NULL)
         return 0;
@@ -185,7 +185,7 @@ void *malloc(size_t size) {
             else
                 break;
         }
-        t_block *new_block = mmap(NULL, size + sizeof(t_block),
+        t_block *new_block = mmap(NULL, size + sizeof(t_block) + ALIGNMENT,
                                   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (new_block == MAP_FAILED) {
             ft_putstr(MUNMAP_ERROR_STRING);

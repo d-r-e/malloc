@@ -236,6 +236,8 @@ void test_million_mallocs()
         ptrs[i] = malloc(sizeof(int) * 1000);
     }
 
+    printf("Freeing...\n");
+
     for (int i = 0; i < 1000000; ++i)
     {
         free(ptrs[i]);
@@ -587,6 +589,56 @@ void test_realloc_tiny_to_small()
     printf(GREEN "Test realloc tiny to small OK\n" RESET);
 }
 
+void test_realloc_tiny_to_large()
+{
+    printf("Testing realloc tiny to large...\n");
+
+    char *ptr_1;
+    char *ptr_2;
+    char *ptr_3;
+    char *ptr_4;
+
+    ptr_1 = malloc(TINY -1);
+    ptr_2 = malloc(TINY -1);
+    ptr_3 = malloc(TINY -1);
+    ptr_4 = malloc(TINY -1);
+
+    ft_memset(ptr_1, 'a', TINY -1);
+    ft_memset(ptr_2, 'b', TINY -1);
+    ft_memset(ptr_3, 'c', TINY -1);
+    ft_memset(ptr_4, 'd', TINY -1);
+
+    ptr_1 = realloc(ptr_1, LARGE);
+    ptr_2 = realloc(ptr_2, LARGE);
+    ptr_3 = realloc(ptr_3, LARGE);
+    ptr_4 = realloc(ptr_4, LARGE);
+
+    if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
+        printf(RED "Memory allocation error\n" RESET);
+    // now check them all
+    for (int i = 0; i < (int)TINY -1; i++)
+    {
+        if (ptr_1[i] != 'a')
+            printf(RED "Memory overwrite error\n" RESET);
+        if (ptr_2[i] != 'b')
+            printf(RED "Memory overwrite error\n" RESET);
+        if (ptr_3[i] != 'c')
+            printf(RED "Memory overwrite error\n" RESET);
+        if (ptr_4[i] != 'd')
+            printf(RED "Memory overwrite error\n" RESET);
+    }
+
+
+
+    if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
+        printf(RED "Memory allocation error\n" RESET);
+    free(ptr_1);
+    free(ptr_2);
+    free(ptr_3);
+    free(ptr_4);
+    printf(GREEN "Test realloc tiny to large OK\n" RESET);
+}
+
 int main()
 {
     test_malloc_small();
@@ -601,11 +653,12 @@ int main()
     test_mem_alignment_extensive();
     test_malloc_with_double_arr_integers();
     test_thousand_hundred_mallocs();
-//    test_million_mallocs();
+    test_million_mallocs();
     test_x();
 //    test_alloc_random_file();
 
     test_simple_realloc();
     test_realloc_tiny_to_small();
+    test_realloc_tiny_to_large();
     return 0;
 }

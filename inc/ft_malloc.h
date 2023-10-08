@@ -10,28 +10,28 @@
 #include <libft.h>
 #include <stdint.h>
 
-#define TINY (size_t)32
-#define SMALL (TINY * 4)
-#define LARGE (SMALL * 16)
+#define TINY 32
+#define SMALL (TINY * 4) // 128
+#define LARGE (SMALL * 16) // 2048
 
 #define ALIGNMENT 8
 // #define TINY 8
 // #define SMALL 16
 // #define LARGE 32
 
-#define N_BLOCKS 8
+# define N_BLOCKS 4
 
-#define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
+# define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 
-#ifndef M_MMAP_THRESHOLD
-#define M_MMAP_THRESHOLD 128 * 1024
-#endif
+# ifndef    M_MMAP_THRESHOLD
+#  define   M_MMAP_THRESHOLD 131072
+# endif
 
-#define BLUE "\e[1;34m"
-#define GREEN "\033[32m"
-#define RED "\033[31m"
-#define RESET "\033[0m"
-#define PURPLE "\e[1;35m"
+# define BLUE "\e[1;34m"
+# define GREEN "\033[32m"
+# define RED "\033[31m"
+# define RESET "\033[0m"
+# define PURPLE "\e[1;35m"
 
 /* TYPES AND STRUCTS */
 typedef struct s_block
