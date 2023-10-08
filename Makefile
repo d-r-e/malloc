@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -DHOSTTYPE="$(HOSTTYPE)"
+CFLAGS = -Wall -Wextra -Werror -O2 -g3 -fPIC -DHOSTTYPE="$(HOSTTYPE)"
 CC = gcc
 CPPFLAGS = -I $(INC) -I libft
 SRC = src/malloc.c src/output.c src/free.c src/realloc.c

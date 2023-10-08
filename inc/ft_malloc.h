@@ -22,15 +22,20 @@
 # include <sys/resource.h>
 # include <unistd.h>
 
-# define TINY 8
-# define SMALL 32
-# define LARGE 1024
-
 # define ALIGNMENT 8
 
+# define TINY (size_t)(8)
+# define SMALL (size_t)(128)
+# define LARGE (size_t)(1024)
+
+
 # ifndef N_BLOCKS
-#  define N_BLOCKS 128
+#  define N_BLOCKS (unsigned int)(getpagesize() / (TINY + sizeof(t_block)))
 # endif
+
+#define TINY_ARENA (((N_BLOCKS * TINY) + sizeof(t_block)) * N_BLOCKS )
+#define SMALL_ARENA (((N_BLOCKS * SMALL) + sizeof(t_block)) * N_BLOCKS )
+
 
 # define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 

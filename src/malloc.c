@@ -31,7 +31,7 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
 }
 
 static int prealloc(size_t size) {
-	int i;
+	unsigned int i;
 	t_block *tmp = NULL;
 	size_t tiny_tblock = sizeof(t_block) + TINY;
 	size_t small_tblock = sizeof(t_block) + SMALL;
@@ -112,7 +112,7 @@ static int extend_heap(t_block *mem, size_t size) {
 		return -1;
 	}
 	mem->next = tmp;
-	for (int i = 0; i < N_BLOCKS; i++) {
+	for (unsigned int i = 0; i < N_BLOCKS; i++) {
 		initialize_block(tmp, size, size + sizeof(t_block), i);
 		if (i == N_BLOCKS - 1)
 			tmp->next = NULL;
