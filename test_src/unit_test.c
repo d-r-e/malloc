@@ -35,7 +35,7 @@ void shuffle(int *array, int n)
 
 int main()
 {
-    const int NUM_ITERATIONS = 1000;
+    const int NUM_ITERATIONS = 10000;
     const int MAX_BLOCK_SIZE = 4096;
 
     char *blocks[NUM_ITERATIONS];

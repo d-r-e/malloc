@@ -22,9 +22,9 @@
 # include <sys/resource.h>
 # include <unistd.h>
 
-# define TINY 32
-# define SMALL 128
-# define LARGE 2048
+# define TINY 8
+# define SMALL 32
+# define LARGE 4096
 
 # define ALIGNMENT 8
 

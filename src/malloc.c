@@ -30,7 +30,7 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
 	}
 }
 
-static int prealloc(void) {
+static int prealloc(size_t size) {
 	int i;
 	t_block *tmp = NULL;
 	size_t tiny_tblock = sizeof(t_block) + TINY;
@@ -39,7 +39,7 @@ static int prealloc(void) {
 
 	if (g_heap.tiny != NULL)
 		return 0;
-	else {
+	if (!g_heap.tiny && size <= TINY ){
 		g_heap.tiny = mmap(NULL, tiny_tblock * N_BLOCKS, PROT_READ | PROT_WRITE,
 						   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.tiny == MAP_FAILED) {
@@ -54,41 +54,46 @@ static int prealloc(void) {
 			tmp = tmp->next;
 		}
 	}
-	g_heap.small = mmap(NULL, small_tblock * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
-						-1, 0);
-	if (g_heap.small == MAP_FAILED) {
-		printf("mmap failed\n");
-		return -1;
-	}
-	tmp = g_heap.small;
-	for (i = 0; i < N_BLOCKS; i++) {
-		initialize_block(tmp, SMALL, small_tblock, i);
-		if (i == N_BLOCKS - 1)
-			tmp->next = NULL;
-		tmp = tmp->next;
-	}
-	g_heap.large = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (g_heap.large == MAP_FAILED) {
-		printf("mmap failed\n");
-		return -1;
-	}
-	initialize_block(g_heap.large, LARGE, large_block, 0);
-	g_heap.large->prev = NULL;
-	g_heap.large->next = NULL;
-	t_block *last_block = g_heap.large;
-	for (i = 1; i < N_BLOCKS; i++) {
-		tmp = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-		if (tmp == MAP_FAILED) {
+	if (!g_heap.small && size <= SMALL){
+		g_heap.small = mmap(NULL, small_tblock * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+							-1, 0);
+		if (g_heap.small == MAP_FAILED) {
 			printf("mmap failed\n");
 			return -1;
 		}
-		initialize_block(tmp, LARGE, sizeof(t_block) + LARGE, i);
-		last_block->next = tmp;
-		tmp->prev = last_block;
-		if (i == N_BLOCKS - 1) {
-			tmp->next = NULL;
+		tmp = g_heap.small;
+		for (i = 0; i < N_BLOCKS; i++) {
+			initialize_block(tmp, SMALL, small_tblock, i);
+			if (i == N_BLOCKS - 1)
+				tmp->next = NULL;
+			tmp = tmp->next;
 		}
-		last_block = tmp;
+	}
+	if (!g_heap.large && size > SMALL)
+	{
+		g_heap.large = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		if (g_heap.large == MAP_FAILED) {
+			printf("mmap failed\n");
+			return -1;
+		}
+		initialize_block(g_heap.large, LARGE, large_block, 0);
+		g_heap.large->prev = NULL;
+		g_heap.large->next = NULL;
+		t_block *last_block = g_heap.large;
+		for (i = 1; i < N_BLOCKS; i++) {
+			tmp = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			if (tmp == MAP_FAILED) {
+				printf("mmap failed\n");
+				return -1;
+			}
+			initialize_block(tmp, LARGE, sizeof(t_block) + LARGE, i);
+			last_block->next = tmp;
+			tmp->prev = last_block;
+			if (i == N_BLOCKS - 1) {
+				tmp->next = NULL;
+			}
+			last_block = tmp;
+		}
 	}
 	// show_alloc_mem();
 	// show_alloc_mem_ex();
@@ -129,7 +134,7 @@ void *malloc(size_t size) {
 	getrlimit(RLIMIT_AS, &limit);
 	if (size > limit.rlim_cur - sizeof(t_block))
 		return NULL;
-	ret = prealloc();
+	ret = prealloc(size);
 	if (ret)
 		return NULL;
 	else if (size <= SMALL) {
