@@ -23,15 +23,17 @@
 #include <unistd.h>
 
 #define TINY 32
-#define SMALL (TINY * 4)  // 128
-#define LARGE (SMALL * 16)// 2048
+#define SMALL 128
+#define LARGE 2048
 
 #define ALIGNMENT 8
 // #define TINY 8
 // #define SMALL 16
 // #define LARGE 32
 
+#ifndef N_BLOCKS
 #define N_BLOCKS 128
+#endif
 
 #define MUNMAP_ERROR_STRING "malloc: error: munmap: Could not free addressed memory."
 

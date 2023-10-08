@@ -98,11 +98,6 @@ static int prealloc(void) {
 }
 
 
-/// @brief Adds a N_BLOCKS block of size SIZE to the appropriate
-///heap zone for SMALL and TINY sizes sets it to mem.next
-/// @param mem
-/// @param size
-/// @return
 static int extend_heap(t_block *mem, size_t size) {
 
 	t_block *tmp = NULL;
@@ -128,9 +123,6 @@ static void *get_aligned_pointer(void *mem, size_t alignment) {
 }
 
 
-/// @brief Well it's malloc!
-/// @param size bytes to allocate
-/// @return a pointer to memory or NULL in case of failure
 void *malloc(size_t size) {
 	t_block *ptr = NULL;
 	struct rlimit limit;
@@ -142,7 +134,7 @@ void *malloc(size_t size) {
 	ret = prealloc();
 	if (ret)
 		return NULL;
-	else if (size && size <= SMALL) {
+	else if (size <= SMALL) {
 		ptr = g_heap.tiny;
 		while (size <= TINY && ptr && ptr->size == TINY) {
 			if (ptr->inuse == false && size <= TINY) {

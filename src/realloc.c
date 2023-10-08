@@ -22,6 +22,8 @@ void *realloc(void *mem, size_t size) {
 	void *actual_mem;
 	t_block *tmp;
 
+	if (!mem)
+		return NULL;
 	actual_mem = disalign_memory(mem, ALIGNMENT);
 	tmp = (t_block *) actual_mem - 1;
 	if (tmp->size != SMALL && tmp->size != TINY && tmp->size < LARGE)
@@ -33,7 +35,10 @@ void *realloc(void *mem, size_t size) {
 	dst = malloc(size);
 	if (!dst)
 		return NULL;
-	ft_memcpy(dst, mem, tmp->size);
+	if (size < tmp->size)
+		ft_memcpy(dst, mem, size);
+	else
+		ft_memcpy(dst, mem, tmp->size);
 	free(mem);
 	return dst;
 }
