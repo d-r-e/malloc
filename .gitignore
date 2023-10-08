@@ -13,3 +13,8 @@ CMakeFiles
 *.cmake
 CMake*
 .fleet
+*.txt
+one
+two
+three
+test_src/test*.c

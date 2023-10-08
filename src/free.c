@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:14:16 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/08 13:29:27 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/08 14:04:31 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ disalign_memory(void *mem, size_t alignment) {
 //     }
 // }
 
-void
-empty_heap(t_block *mem) {
+void empty_heap(t_block *mem) {
 	unsigned int free_blocks = 0;
 	t_block *tmp;
 	int res;
@@ -63,8 +62,7 @@ empty_heap(t_block *mem) {
 //     }
 // }
 
-void
-free(void *ptr) {
+void free(void *ptr) {
 	t_block *block;
 	int err;
 
