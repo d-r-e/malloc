@@ -36,9 +36,9 @@ void *realloc(void *mem, size_t size) {
 	if (!dst)
 		return NULL;
 	if (size < tmp->size)
-		ft_memcpy(dst, mem, size);
+		ft_memmove(dst, mem, size);
 	else
-		ft_memcpy(dst, mem, tmp->size);
+		ft_memmove(dst, mem, tmp->size);
 	free(mem);
 	return dst;
 }

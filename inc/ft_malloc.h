@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/08 14:04:35 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/10 18:16:52 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,19 @@
 # include <sys/mman.h>
 # include <sys/resource.h>
 # include <unistd.h>
+# include <limits.h>
 
-# define ALIGNMENT 8
+# define ALIGNMENT (8)
 
-# define TINY (size_t)(8)
-# define SMALL (size_t)(128)
-# define LARGE (size_t)(1024)
-
+# define TINY (size_t)(4096 / (ALIGNMENT + sizeof(t_block) + ALIGNMENT - 1))
+# define SMALL (TINY * 4)
+# define LARGE (size_t)(TINY * 16)
+//# define TINY 4
+//# define SMALL (TINY * 4)
+//# define LARGE (size_t)(TINY * 16)
 
 # ifndef N_BLOCKS
-#  define N_BLOCKS (unsigned int)(getpagesize() / (TINY + sizeof(t_block)))
+#  define N_BLOCKS 2
 # endif
 
 #define TINY_ARENA (((N_BLOCKS * TINY) + sizeof(t_block)) * N_BLOCKS )

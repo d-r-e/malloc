@@ -16,22 +16,40 @@ static void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
 
-//static int check_last_n_blocks_not_inuse(t_block *block) {
-//	int count = 0;
-//	while (block->next) {
-//		block = block->next;
-//	}
-//	while (block && count < N_BLOCKS) {
-//		if (block->inuse)
-//			return 0;
-//		block = block->prev;
-//		count++;
-//	}
-//#if MALLOC_DEBUG
-//	printf("check_last_n_blocks_not_inuse: %d\n", count);
-//#endif
-//	return (count == N_BLOCKS);
-//}
+void clear_chunk(size_t size){
+	t_block *ptr;
+	size_t counter = 0;
+
+	if (size <= TINY)
+		ptr = g_heap.tiny;
+	else if (size <= SMALL)
+		ptr = g_heap.small;
+	else
+		ptr = g_heap.large;
+	while (ptr) {
+		if (ptr->inuse == false)
+			counter++;
+		if (counter == N_BLOCKS) {
+			if (size <= TINY){
+				if (ptr && ptr->next)
+					ptr = ptr->next;
+				munmap((void *) g_heap.tiny, N_BLOCKS * (sizeof(t_block ) + TINY + ALIGNMENT));
+				g_heap.tiny = ptr;
+			}
+			else if (size <= SMALL){
+				if (ptr->next)
+					ptr = ptr->next;
+				munmap((void *) g_heap.small, N_BLOCKS * (sizeof(t_block ) + SMALL + ALIGNMENT));
+				g_heap.small = ptr;
+			}
+
+
+			break;
+		}
+		ptr = ptr->next;
+	}
+
+}
 
 void free(void *ptr) {
 	t_block *block;
@@ -57,6 +75,9 @@ void free(void *ptr) {
 			exit(ret);
 		}
 	}
+
+//	clear_chunk(block->size);
+
 //	else if (block->size == TINY && check_last_n_blocks_not_inuse(g_heap.tiny)) {
 //
 //		ret = munmap((void *) g_heap.tiny, N_BLOCKS * (sizeof(t_block *) + TINY));

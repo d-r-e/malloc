@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:13:30 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/08 14:08:51 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/10 18:25:39 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,18 @@ static int prealloc(size_t size) {
 	size_t small_tblock = sizeof(t_block) + SMALL;
 	size_t large_block = sizeof(t_block) + LARGE + ALIGNMENT;
 
-	if (g_heap.tiny != NULL)
-		return 0;
-	if (!g_heap.tiny && size <= TINY ){
+#ifdef MALLOC_DEBUG
+	int pagesize = getpagesize();
+	float pages;
+#endif
+
+	if (!g_heap.tiny && size <= TINY) {
+
+#ifdef MALLOC_DEBUG
+		pages = (float) (tiny_tblock * N_BLOCKS + ALIGNMENT) / pagesize;
+		printf("Allocating %d pages for %d blocks of size %zu (tiny)\n", (int) (pages), N_BLOCKS, tiny_tblock);
+#endif
+
 		g_heap.tiny = mmap(NULL, tiny_tblock * N_BLOCKS, PROT_READ | PROT_WRITE,
 						   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.tiny == MAP_FAILED) {
@@ -54,7 +63,12 @@ static int prealloc(size_t size) {
 			tmp = tmp->next;
 		}
 	}
-	if (!g_heap.small && size <= SMALL){
+	if (!g_heap.small && size > TINY && size <= SMALL) {
+
+#ifdef MALLOC_DEBUG
+		pages = (float) (small_tblock * N_BLOCKS) / pagesize;
+		printf("Allocating %d pages for %d blocks of size %zu (small)\n", (int) (pages), N_BLOCKS, small_tblock);
+#endif
 		g_heap.small = mmap(NULL, small_tblock * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 							-1, 0);
 		if (g_heap.small == MAP_FAILED) {
@@ -69,8 +83,13 @@ static int prealloc(size_t size) {
 			tmp = tmp->next;
 		}
 	}
-	if (!g_heap.large && size > SMALL)
-	{
+	if (!g_heap.large && size > SMALL) {
+
+#ifdef MALLOC_DEBUG
+		pages = (float) (large_block * N_BLOCKS) / pagesize;
+		printf("Allocating %d pages for %d blocks of size %zu (large)\n", (int) (pages), N_BLOCKS, large_block);
+#endif
+
 		g_heap.large = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.large == MAP_FAILED) {
 			printf("mmap failed\n");
@@ -132,10 +151,10 @@ void *malloc(size_t size) {
 	int ret = 0;
 
 	getrlimit(RLIMIT_AS, &limit);
-	if (size > limit.rlim_cur - sizeof(t_block))
+	if (size > limit.rlim_cur - (sizeof(t_block) + ALIGNMENT))
 		return NULL;
 	ret = prealloc(size);
-	if (ret)
+	if (ret || size > SIZE_MAX)
 		return NULL;
 	else if (size <= SMALL) {
 		ptr = g_heap.tiny;
@@ -144,11 +163,11 @@ void *malloc(size_t size) {
 				ptr->inuse = true;
 				return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
 			}
-			if (ptr->next == NULL){
+			if (ptr->next == NULL) {
 				ret = extend_heap(ptr, TINY);
-                if (ret)
-                    return NULL;
-            }
+				if (ret)
+					return NULL;
+			}
 			ptr = ptr->next;
 		}
 		if (size > TINY && size <= SMALL) {
@@ -158,12 +177,12 @@ void *malloc(size_t size) {
 					ptr->inuse = true;
 					return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
 				}
-				if (ptr->next == NULL){
+				if (ptr->next == NULL) {
 
 					ret = extend_heap(ptr, SMALL);
-                    if (ret)
-                        return NULL;   
-                }
+					if (ret)
+						return NULL;
+				}
 				ptr = ptr->next;
 			}
 		}
