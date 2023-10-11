@@ -17,6 +17,30 @@ static void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
 
+bool is_allocated(t_block *ptr) {
+	t_block *tmp;
+
+	tmp = g_heap.tiny;
+	while (tmp) {
+		if (tmp == ptr)
+			return true;
+		tmp = tmp->next;
+	}
+	tmp = g_heap.small;
+	while (tmp) {
+		if (tmp == ptr)
+			return true;
+		tmp = tmp->next;
+	}
+	tmp = g_heap.large;
+	while (tmp) {
+		if (tmp == ptr)
+			return true;
+		tmp = tmp->next;
+	}
+	return false;
+}
+
 void *realloc(void *mem, size_t size) {
 	void *dst;
 	void *actual_mem;
@@ -26,6 +50,8 @@ void *realloc(void *mem, size_t size) {
 		return malloc(size);
 	actual_mem = disalign_memory(mem, ALIGNMENT);
 	tmp = (t_block *) actual_mem - 1;
+	if (!is_allocated(tmp))
+		return NULL;
 	if (tmp->size != SMALL && tmp->size != TINY && tmp->size < LARGE)
 		return NULL;
 	if (size <= TINY && tmp->size == TINY)
