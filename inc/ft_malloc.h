@@ -25,15 +25,15 @@
 
 # define ALIGNMENT (8)
 
-# define TINY (size_t)(4096 / (ALIGNMENT + sizeof(t_block) + ALIGNMENT - 1))
-# define SMALL (TINY * 4)
-# define LARGE (size_t)(TINY * 16)
+# define TINY (size_t)(4096 / (sizeof(t_block) + 128  + ALIGNMENT ))
+# define SMALL (size_t)(4096 / (ALIGNMENT + sizeof(t_block) + 64 ))
+# define LARGE (size_t)(4096 / (ALIGNMENT + sizeof(t_block) + 16 ))
 //# define TINY 4
 //# define SMALL (TINY * 4)
 //# define LARGE (size_t)(TINY * 16)
 
 # ifndef N_BLOCKS
-#  define N_BLOCKS 2
+#  define N_BLOCKS 128
 # endif
 
 #define TINY_ARENA (((N_BLOCKS * TINY) + sizeof(t_block)) * N_BLOCKS )

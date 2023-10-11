@@ -33,19 +33,25 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
 static int prealloc(size_t size) {
 	unsigned int i;
 	t_block *tmp = NULL;
-	size_t tiny_tblock = sizeof(t_block) + TINY;
-	size_t small_tblock = sizeof(t_block) + SMALL;
+	size_t tiny_tblock = sizeof(t_block) + TINY + ALIGNMENT;
+	size_t small_tblock = sizeof(t_block) + SMALL + ALIGNMENT;
 	size_t large_block = sizeof(t_block) + LARGE + ALIGNMENT;
 
 #ifdef MALLOC_DEBUG
 	int pagesize = getpagesize();
 	float pages;
+
+	if (!g_heap.small && !g_heap.tiny && size <= TINY) {
+		printf("TINY: %zu\n", TINY);
+		printf("SMALL: %zu\n", SMALL);
+		printf("LARGE: %zu\n", LARGE);
+	}
 #endif
 
 	if (!g_heap.tiny && size <= TINY) {
 
 #ifdef MALLOC_DEBUG
-		pages = (float) (tiny_tblock * N_BLOCKS + ALIGNMENT) / pagesize;
+		pages = (float) (tiny_tblock * N_BLOCKS) / pagesize;
 		printf("Allocating %d pages for %d blocks of size %zu (tiny)\n", (int) (pages), N_BLOCKS, tiny_tblock);
 #endif
 
@@ -69,7 +75,9 @@ static int prealloc(size_t size) {
 		pages = (float) (small_tblock * N_BLOCKS) / pagesize;
 		printf("Allocating %d pages for %d blocks of size %zu (small)\n", (int) (pages), N_BLOCKS, small_tblock);
 #endif
-		g_heap.small = mmap(NULL, small_tblock * N_BLOCKS, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+//		size_t total_to_alloc = small_tblock * N_BLOCKS;
+//		printf("total_to_alloc: %zu\n", total_to_alloc);
+		g_heap.small = mmap(NULL, total_to_alloc, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 							-1, 0);
 		if (g_heap.small == MAP_FAILED) {
 			printf("mmap failed\n");

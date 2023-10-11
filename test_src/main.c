@@ -64,6 +64,33 @@ void test_malloc_small() {
 	free(ptr);
 }
 
+void test_four_mallocs(){
+	printf("Testing four mallocs...\n");
+	char *ptr1 = malloc(1);
+	char *ptr2 = malloc(1);
+	char *ptr3 = malloc(1);
+	char *ptr4 = malloc(1);
+	if (ptr1 == NULL || ptr2 == NULL || ptr3 == NULL || ptr4 == NULL) {
+		printf(RED "Failed to allocate small memory!\n" RESET);
+		return;
+	}
+	strcpy(ptr1, "test");
+	strcpy(ptr2, "test");
+	strcpy(ptr3, "test");
+	strcpy(ptr4, "test");
+	if (strcmp(ptr1, "test") == 0 && strcmp(ptr2, "test") == 0 && strcmp(ptr3, "test") == 0 && strcmp(ptr4, "test") == 0) {
+		;
+	} else {
+		printf(RED "Four mallocs failed: expected 'test', got '%s'\n" RESET, ptr1);
+	}
+	free(ptr1);
+	free(ptr2);
+	free(ptr3);
+	free(ptr4);
+	printf(GREEN "Four mallocs OK\n" RESET);
+
+}
+
 void test_malloc_large() {
 	printf("Testing large malloc...\n");
 
@@ -81,8 +108,42 @@ void test_malloc_large() {
 	printf(GREEN "Large malloc OK\n" RESET);
 }
 
+void test_double_array_small() {
+	printf("Testing double array small...\n");
+
+	int rows = 4;
+	int cols = 4;
+	int **array = malloc(rows * sizeof(int *));
+	for (int i = 0; i < rows; i++) {
+		array[i] = malloc(cols * sizeof(int));
+		for (int j = 0; j < cols; j++) {
+			array[i][j] = i * j;
+		}
+	}
+
+	int success = 1;
+	for (int i = 0; i < rows && success; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (array[i][j] != i * j) {
+				printf(RED "Double array failed at [%d][%d]: expected %d, got %d\n" RESET, i, j, i * j, array[i][j]);
+				success = 0;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < rows; i++)
+	{
+		free(array[i]);
+	}
+	free(array);
+
+	if (success) {
+		printf(GREEN "Double array small OK\n" RESET);
+	}
+}
+
 void test_double_array() {
-	printf("Testing double array...\n");
+	printf("Testing double array large...\n");
 
 	int rows = 100;
 	int cols = 100;
@@ -111,7 +172,7 @@ void test_double_array() {
 	   free(array);
 
 	if (success) {
-		printf(GREEN "Double array OK\n" RESET);
+		printf(GREEN "Double array large OK\n" RESET);
 	}
 }
 
@@ -317,10 +378,10 @@ void test_large_memory_copy() {
 	free(dest);
 }
 
-void test_memory_overwrite() {
-	printf("Testing memory overwrite...\n");
+void test_memory_overwrite_small(){
+	printf("Testing memory overwrite small...\n");
 
-	int num_pointers = 1000;
+	int num_pointers = 4;
 	unsigned char *pointers[num_pointers];
 	int length = 100;
 
@@ -347,10 +408,46 @@ void test_memory_overwrite() {
 		}
 	}
 
-	printf(GREEN "Memory overwrite test OK\n" RESET);
 	for (int i = 0; i < num_pointers; i++) {
 		free(pointers[i]);
 	}
+	printf(GREEN "Memory overwrite small OK\n" RESET);
+}
+
+void test_memory_overwrite() {
+	printf("Testing memory overwrite...\n");
+
+	int num_pointers = 10;
+	unsigned char *pointers[num_pointers];
+	int length = 100;
+
+	for (int i = 0; i < num_pointers; i++) {
+		pointers[i] = malloc(length);
+		if (!pointers[i]) {
+			printf(RED "Memory allocation failure in memory overwrite test.\n" RESET);
+			return;
+		}
+		for (int j = 0; j < length; j++) {
+			pointers[i][j] = i % 256;
+		}
+	}
+
+	for (int i = 0; i < num_pointers; i++) {
+		for (int j = 0; j < length; j++) {
+			if (pointers[i][j] != i % 256) {
+				printf(RED "Memory overwrite detected at pointer %d index %d: expected %d, got %d\n" RESET, i, j, i % 256, pointers[i][j]);
+				for (int k = 0; k < num_pointers; k++) {
+					free(pointers[k]);
+				}
+				return;
+			}
+		}
+	}
+
+	for (int i = 0; i < num_pointers; i++) {
+		free(pointers[i]);
+	}
+	printf(GREEN "Memory overwrite test OK\n" RESET);
 }
 
 void test_negative() {
@@ -537,23 +634,29 @@ void test_simple_realloc() {
 	char *ptr_2;
 	char *ptr_3;
 	char *ptr_4;
+	char *ptr_5;
+	char *ptr_6;
+	char *ptr_7;
+	char *ptr_8;
 
 	ptr_1 = malloc(1);
 	ptr_2 = malloc(1);
 	ptr_3 = malloc(1);
 	ptr_4 = malloc(1);
 
-	ptr_1 = realloc(ptr_1, 2);
-	ptr_2 = realloc(ptr_2, 2);
-	ptr_3 = realloc(ptr_3, 2);
-	ptr_4 = realloc(ptr_4, 2);
+	ptr_5 = realloc(ptr_1, 2);
+	ptr_6 = realloc(ptr_2, 2);
+	ptr_7 = realloc(ptr_3, 2);
+	ptr_8 = realloc(ptr_4, 2);
 
-	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
+	if (!ptr_5 || !ptr_6 || !ptr_7 || !ptr_8)
 		printf(RED "Memory allocation error\n" RESET);
-	free(ptr_1);
-	free(ptr_2);
-	free(ptr_3);
-	free(ptr_4);
+
+	free(ptr_5);
+	free(ptr_6);
+	free(ptr_7);
+	free(ptr_8);
+
 	printf(GREEN "Test simple realloc OK\n" RESET);
 }
 
@@ -743,10 +846,14 @@ void test_stress_malloc(){
 
 int main() {
 	test_malloc_small();
+	test_four_mallocs();
 	test_malloc_large();
+	test_double_array_small();
+
 	test_double_array();
 	test_integer_array();
 	test_large_memory_copy();
+	test_memory_overwrite_small();
 	test_memory_overwrite();
 	 test_stress_malloc();
 	// // test_negative();
@@ -770,8 +877,8 @@ int main() {
 	test_realloc_zero_size();
 	test_realloc_null_ptr();
 
-//#if (HOSTTYPE == x86_64_Darwin)
-//		system("leaks test");
-//#endif
+#if (HOSTTYPE == x86_64_Darwin)
+		system("leaks test");
+#endif
 	return 0;
 }

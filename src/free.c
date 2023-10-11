@@ -15,10 +15,11 @@
 static void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
-
 void clear_chunk(size_t size){
 	t_block *ptr;
 	size_t counter = 0;
+	size_t i = 0;
+	int ret = 0;
 
 	if (size <= TINY)
 		ptr = g_heap.tiny;
@@ -26,26 +27,32 @@ void clear_chunk(size_t size){
 		ptr = g_heap.small;
 	else
 		ptr = g_heap.large;
-	while (ptr) {
+	while (ptr && i < N_BLOCKS) {
 		if (ptr->inuse == false)
 			counter++;
 		if (counter == N_BLOCKS) {
 			if (size <= TINY){
-				if (ptr && ptr->next)
-					ptr = ptr->next;
-				munmap((void *) g_heap.tiny, N_BLOCKS * (sizeof(t_block ) + TINY + ALIGNMENT));
+				ptr = ptr->next;
+				ret = munmap((void *) g_heap.tiny, N_BLOCKS * (sizeof(t_block ) + TINY + ALIGNMENT));
+				if (ret) {
+					ft_puts(MUNMAP_ERROR_STRING);
+					exit(254);
+				}
 				g_heap.tiny = ptr;
 			}
 			else if (size <= SMALL){
-				if (ptr->next)
-					ptr = ptr->next;
-				munmap((void *) g_heap.small, N_BLOCKS * (sizeof(t_block ) + SMALL + ALIGNMENT));
+				ptr = ptr->next;
+				ret = munmap((void *) g_heap.small, N_BLOCKS * (sizeof(t_block ) + SMALL + ALIGNMENT));
+				if (ret) {
+					ft_puts(MUNMAP_ERROR_STRING);
+					exit(254);
+				}
 				g_heap.small = ptr;
 			}
 
-
 			break;
 		}
+		++i;
 		ptr = ptr->next;
 	}
 
@@ -71,12 +78,13 @@ void free(void *ptr) {
 
 		if (munmap((void *) block, sizeof(t_block) + block->size + ALIGNMENT)) {
 			ft_puts(MUNMAP_ERROR_STRING);
-			ret = -1;
+			ret = ft_strlen(MUNMAP_ERROR_STRING);
 			exit(ret);
 		}
 	}
-
-//	clear_chunk(block->size);
+	else if (block){
+		clear_chunk(block->size);
+	}
 
 //	else if (block->size == TINY && check_last_n_blocks_not_inuse(g_heap.tiny)) {
 //
