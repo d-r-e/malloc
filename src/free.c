@@ -35,7 +35,7 @@ void clear_chunk(size_t size){
 		if (counter == N_BLOCKS) {
 			if (size <= TINY){
 				ptr = ptr->next;
-				ret = munmap((void *) g_heap.tiny, N_BLOCKS * (sizeof(t_block ) + TINY + ALIGNMENT));
+				ret = munmap((void *) g_heap.tiny, TINY_ARENA);
 				if (ret) {
 					ft_puts(MUNMAP_ERROR_STRING);
 					exit(254);
@@ -44,7 +44,7 @@ void clear_chunk(size_t size){
 			}
 			else if (size <= SMALL){
 				ptr = ptr->next;
-				ret = munmap((void *) g_heap.small, N_BLOCKS * (sizeof(t_block ) + SMALL + ALIGNMENT));
+				ret = munmap((void *) g_heap.small, SMALL_ARENA);
 				if (ret) {
 					ft_puts(MUNMAP_ERROR_STRING);
 					exit(254);

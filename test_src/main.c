@@ -855,8 +855,8 @@ int main() {
 	test_large_memory_copy();
 	test_memory_overwrite_small();
 	test_memory_overwrite();
-	 test_stress_malloc();
-	// // test_negative();
+//	 test_stress_malloc();
+	  test_negative();
 	test_zero();
 	test_mem_alignment();
 	test_mem_alignment_extensive();
@@ -864,7 +864,7 @@ int main() {
 	test_thousand_hundred_mallocs();
 	test_thousand_hundred_mallocs_write_read();
 	 test_million_mallocs();
-	// test_gazillion_mallocs();
+	 test_gazillion_mallocs();
 	test_x();
 	// test_alloc_random_file();
 	test_simple_realloc();
@@ -876,9 +876,9 @@ int main() {
 	test_realloc_shrinking();
 	test_realloc_zero_size();
 	test_realloc_null_ptr();
-
-#if (HOSTTYPE == x86_64_Darwin)
-		system("leaks test");
-#endif
+//
+//#if (HOSTTYPE == x86_64_Darwin)
+//		system("leaks test");
+//#endif
 	return 0;
 }

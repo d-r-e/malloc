@@ -38,7 +38,7 @@ static int prealloc(size_t size) {
 	size_t large_block = sizeof(t_block) + LARGE + ALIGNMENT;
 
 	if (!g_heap.tiny && size <= TINY) {
-		g_heap.tiny = mmap(NULL, tiny_tblock * N_BLOCKS, PROT_READ | PROT_WRITE,
+		g_heap.tiny = mmap(NULL, TINY_ARENA, PROT_READ | PROT_WRITE,
 						   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.tiny == MAP_FAILED) {
 			printf("mmap failed\n");
@@ -53,9 +53,8 @@ static int prealloc(size_t size) {
 		}
 	}
 	if (!g_heap.small && size > TINY && size <= SMALL) {
-		size_t total_to_alloc = small_tblock * N_BLOCKS;
 //		printf("total_to_alloc: %zu\n", total_to_alloc);
-		g_heap.small = mmap(NULL, total_to_alloc, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+		g_heap.small = mmap(NULL, SMALL_ARENA, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 							-1, 0);
 		if (g_heap.small == MAP_FAILED) {
 			printf("mmap failed\n");
@@ -105,6 +104,10 @@ static int extend_heap(t_block *mem, size_t size) {
 	t_block *tmp = NULL;
 
 	size_t size_to_extend = N_BLOCKS * (sizeof(t_block) + size);
+	if (size <= TINY)
+		size_to_extend = TINY_ARENA;
+	else if (size <= SMALL)
+		size_to_extend = SMALL_ARENA;
 	tmp = mmap(NULL, size_to_extend, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (tmp == MAP_FAILED) {
 		printf("mmap failed\n");
