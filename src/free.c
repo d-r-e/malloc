@@ -30,6 +30,8 @@ void clear_chunk(size_t size){
 	while (ptr && i < N_BLOCKS) {
 		if (ptr->inuse == false)
 			counter++;
+		else
+			break;
 		if (counter == N_BLOCKS) {
 			if (size <= TINY){
 				ptr = ptr->next;
