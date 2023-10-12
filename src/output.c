@@ -13,6 +13,7 @@
 #include <ft_malloc.h>
 
 /// \brief
+/// \author Darodrig
 ///       Prints the memory in hex format
 /// \param ptr pointer to the memory
 /// \param size in bytes
@@ -33,14 +34,16 @@ static void hexdump(void *ptr, size_t size) {
 }
 
 /// \brief
-///       Prints the memory in ascii format
+/// \author Darodrig
+///       Prints the heap structure in human readable format
 void show_alloc_mem() {
 	t_block *tmp = g_heap.tiny;
 	unsigned long long total_size = 0;
 
+	tmp = g_heap.tiny;
 	printf("TINY : %p\n", (void *) tmp);
-	for (unsigned int i = 0; i < N_BLOCKS && tmp; ++i) {
-		printf("%5d · %p - %p : %3lu bytes\n", i,
+	for (size_t i = 0; tmp; ++i) {
+		printf("%5zu · %p - %p : %3lu bytes\n", i,
 			   (void *) ((char *) tmp + sizeof(t_block)),
 			   (void *) ((char *) tmp + sizeof(t_block) + TINY),
 			   tmp->size);
@@ -70,7 +73,8 @@ void show_alloc_mem() {
 }
 
 /// \brief
-///       Prints the memory in hex format
+/// \author Darodrig
+///   Prints the memory in hex format
 void show_alloc_mem_ex() {
 	t_block *tmp = NULL;
 	unsigned int i = 0;

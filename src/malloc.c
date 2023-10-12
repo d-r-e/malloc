@@ -35,7 +35,6 @@ static int prealloc(void) {
 	t_block *tmp = NULL;
 	size_t tiny_tblock = sizeof(t_block) + TINY + ALIGNMENT;
 	size_t small_tblock = sizeof(t_block) + SMALL + ALIGNMENT;
-//	size_t large_block = sizeof(t_block) + LARGE + ALIGNMENT;
 
 	if (!g_heap.tiny ) {
 		g_heap.tiny = mmap(NULL, TINY_ARENA, PROT_READ | PROT_WRITE,
@@ -142,7 +141,6 @@ void *malloc(size_t size) {
 					return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
 				}
 				if (ptr->next == NULL) {
-
 					ret = extend_heap(ptr, SMALL);
 					if (ret)
 						return NULL;
@@ -159,7 +157,7 @@ void *malloc(size_t size) {
 			if (ptr->inuse == false && size <= ptr->size) {
 				ptr->inuse = true;
 #ifdef MALLOC_DEBUG
-				printf("malloc found block: %p\n", &ptr);
+				MALLOC_DEBUG_PRINT("malloc: debug: found block: %p\n", &ptr);
 #endif
 				return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
 			}

@@ -100,7 +100,7 @@ void test_malloc_large() {
 	}
 
 	for (int i = 0; i < 10 * 1024; i++) {
-		ptr[i] = i % 256;// just to fill the memory
+		ptr[i] = i % 256;
 	}
 
 	free(ptr);

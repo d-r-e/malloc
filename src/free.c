@@ -40,7 +40,7 @@ void clear_chunk(size_t size) {
 				ptr = ptr->next;
 				ret = munmap((void *) g_heap.tiny, TINY_ARENA);
 				if (ret) {
-					ft_puts(MUNMAP_ERROR_STRING);
+					dprintf(2, "Error: %s for size %zu\n", MUNMAP_ERROR_STRING, size);
 					exit(253);
 				}
 				g_heap.tiny = ptr;
@@ -92,7 +92,9 @@ bool is_block_allocated(t_block *block){
 
 /// \brief Frees a memory block
 /// \author Darodrig
-/// \details Frees a memory block previously allocated with malloc or realloc
+/// \details
+///   The free() function deallocates the memory allocation pointed to by ptr.
+///   If ptr is a NULL pointer, no operation is performed.
 /// \param ptr
 void free(void *ptr) {
 	t_block *block;
@@ -123,7 +125,6 @@ void free(void *ptr) {
 			}
 		} else if (block) {
 			clear_chunk(block->size);
-//			ft_puts("clear chunk succeeded");
 		}
 	}
 }
