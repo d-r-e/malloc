@@ -184,7 +184,7 @@ void test_malloc() {
 		char *test_string = generate_random_string(length);
 
 		ptrs[i] = malloc(length + 1);
-		ft_strlcpy(ptrs[i], test_string, length + 1);
+		ft_strncpy(ptrs[i], test_string, length + 1);
 		test_strings[i] = test_string;// Store the test string.
 	}
 
@@ -703,10 +703,10 @@ void test_realloc_tiny_to_large() {
 	ptr_3 = malloc(TINY - 1);
 	ptr_4 = malloc(TINY - 1);
 
-	strlcpy(ptr_1, "a", TINY - 1);
-	strlcpy(ptr_2, "b", TINY - 1);
-	strlcpy(ptr_3, "c", TINY - 1);
-	strlcpy(ptr_4, "d", TINY - 1);
+	strncpy(ptr_1, "a", TINY - 1);
+	strncpy(ptr_2, "b", TINY - 1);
+	strncpy(ptr_3, "c", TINY - 1);
+	strncpy(ptr_4, "d", TINY - 1);
 
 
 	ptr_1 = realloc(ptr_1, LARGE);

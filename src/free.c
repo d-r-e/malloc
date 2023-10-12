@@ -98,7 +98,6 @@ bool is_block_allocated(t_block *block){
 /// \param ptr
 void free(void *ptr) {
 	t_block *block;
-	int ret = 0;
 
 	if (!ptr)
 		return;
@@ -120,7 +119,6 @@ void free(void *ptr) {
 			block->inuse = false;
 			if (munmap((void *) block, block->size + OVERHEAD)) {
 				dprintf(2, "free: %s for size %lu\n", MUNMAP_ERROR_STRING, block->size);
-				ret = ft_strlen(MUNMAP_ERROR_STRING);
 				exit(252);
 			}
 		} else if (block) {
