@@ -23,7 +23,7 @@
 # include <unistd.h>
 # include <limits.h>
 
-# define ALIGNMENT (16)
+# define ALIGNMENT 16
 
 /* TYPES AND STRUCTS */
 typedef struct s_block {
@@ -51,13 +51,13 @@ enum BlockType {
 #define PAGE_SIZE 4096
 
 # ifndef N_BLOCKS
-#  define N_BLOCKS 128
+#  define N_BLOCKS 100
 # endif
 
 #define OVERHEAD (sizeof(t_block) + ALIGNMENT)
 
-# define TINY (size_t)8
-# define SMALL (size_t)(TINY * 16)
+# define TINY (size_t)32
+# define SMALL (size_t)(TINY * 128)
 
 #define TINY_ARENA (ceil((double)(TINY * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
 #define SMALL_ARENA (ceil((double)(SMALL * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)

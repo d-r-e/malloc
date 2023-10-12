@@ -19,11 +19,10 @@
 # define GREEN "\033[32m"
 #endif
 
-#ifndef TINY
-# define TINY 32
-# define SMALL (TINY * 4)
-# define LARGE (SMALL * 16)
+#ifndef LARGE
+# define LARGE 4096 * 4
 #endif
+
 void seed_rand() {
 	srand(time(NULL));
 }
@@ -66,10 +65,10 @@ void test_malloc_small() {
 
 void test_four_mallocs(){
 	printf("Testing four mallocs...\n");
-	char *ptr1 = malloc(1);
-	char *ptr2 = malloc(1);
-	char *ptr3 = malloc(1);
-	char *ptr4 = malloc(1);
+	char *ptr1 = malloc(5);
+	char *ptr2 = malloc(5);
+	char *ptr3 = malloc(5);
+	char *ptr4 = malloc(5);
 	if (ptr1 == NULL || ptr2 == NULL || ptr3 == NULL || ptr4 == NULL) {
 		printf(RED "Failed to allocate small memory!\n" RESET);
 		return;
@@ -634,15 +633,20 @@ void test_simple_realloc() {
 	char *ptr_2;
 	char *ptr_3;
 	char *ptr_4;
-	char *ptr_5;
-	char *ptr_6;
-	char *ptr_7;
-	char *ptr_8;
+	char *ptr_5 = NULL;
+	char *ptr_6 = NULL;
+	char *ptr_7 =NULL;
+	char *ptr_8 =NULL;
 
 	ptr_1 = malloc(1);
 	ptr_2 = malloc(1);
 	ptr_3 = malloc(1);
 	ptr_4 = malloc(1);
+
+	ft_strlcpy(ptr_1, "a", 2);
+	ft_strlcpy(ptr_2, "b", 2);
+	ft_strlcpy(ptr_3, "c", 2);
+	ft_strlcpy(ptr_4, "d", 2);
 
 	ptr_5 = realloc(ptr_1, 2);
 	ptr_6 = realloc(ptr_2, 2);
@@ -844,6 +848,26 @@ void test_stress_malloc(){
 	printf(GREEN "Test stress malloc OK\n" RESET);
 }
 
+void test_return_100_mallocs_to_the_same_ptr(){
+	int i = 0;
+	char *ptr;
+
+	printf("Testing return 100 mallocs to the same ptr...\n");
+
+	while (i < 1024){
+		ptr = malloc(1024);
+		if (!ptr) {
+			printf(RED "Initial memory allocation error\n" RESET);
+			return;
+		}
+		ft_bzero(ptr, 100);
+		i++;
+	}
+
+	free(ptr);
+	printf(GREEN "Test return 100 mallocs to the same ptr OK\n" RESET);
+}
+
 int main() {
 	test_malloc_small();
 	test_four_mallocs();
@@ -866,6 +890,7 @@ int main() {
 	 test_million_mallocs();
 	 test_gazillion_mallocs();
 	test_x();
+	test_return_100_mallocs_to_the_same_ptr();
 	// test_alloc_random_file();
 	test_simple_realloc();
 	test_realloc_tiny_to_small();

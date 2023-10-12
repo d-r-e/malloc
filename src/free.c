@@ -12,9 +12,12 @@
 
 #include <ft_malloc.h>
 
-static void *disalign_memory(void *mem, size_t alignment) {
+static
+void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
+
+static
 void clear_chunk(size_t size) {
 	t_block *ptr;
 	size_t counter = 0;
@@ -61,7 +64,7 @@ void clear_chunk(size_t size) {
 	}
 }
 
-
+static
 bool is_block_allocated(t_block *block){
 	t_block *tmp;
 
@@ -86,6 +89,11 @@ bool is_block_allocated(t_block *block){
 	return false;
 }
 
+
+/// \brief Frees a memory block
+/// \author Darodrig
+/// \details Frees a memory block previously allocated with malloc or realloc
+/// \param ptr
 void free(void *ptr) {
 	t_block *block;
 	int ret = 0;
@@ -97,13 +105,9 @@ void free(void *ptr) {
 	if (block->inuse == false || !is_block_allocated(block))
 		return;
 
-//	if (block->size > SMALL)
-//		show_alloc_mem();
+
 	if (block) {
 		if (block->size > SMALL && block->size <= SIZE_MAX) {
-//			printf("block->prev %p\n", block->prev);
-//			printf("block->next %p\n", block->next);
-
 			if (block->prev)
 				block->prev->next = block->next ? block->next : NULL;
 			else

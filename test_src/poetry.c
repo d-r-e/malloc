@@ -1,7 +1,7 @@
 #include "../inc/ft_malloc.h"
 #include "../libft/libft.h"
 
-int main(void) {
+int main2(void) {
 	char *poetry =
 			"Lorem Ipsum es simplemente el texto de relleno de las \
     imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno \
@@ -66,4 +66,16 @@ int main(void) {
 	}
 	free(modified_spl);
 	//    show_alloc_mem();
+	return (0);
+}
+
+int main(){
+	char *ptr = malloc(1);
+	char *ptr2 = malloc(100);
+	char *ptr3 = malloc(100000);
+
+	memcpy(ptr, "Hello", 6);
+	memcpy(ptr2, "World", 6);
+	memcpy(ptr3, "!", 2);
+	show_alloc_mem();
 }

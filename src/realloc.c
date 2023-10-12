@@ -17,6 +17,7 @@ static void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
 
+static
 bool is_allocated(t_block *ptr) {
 	t_block *tmp;
 
@@ -41,6 +42,20 @@ bool is_allocated(t_block *ptr) {
 	return false;
 }
 
+/// \brief
+///  Reallocates a memory block
+/// \details
+///  The realloc() function tries to change the size of the allocation pointed
+/// to by ptr to size, and returns ptr. If there is not enough room to enlarge
+/// the memory allocation pointed to by ptr, realloc() creates a new allocation,
+/// copies as much of the old data pointed to by ptr as will fit to the new
+/// allocation, frees the old allocation, and returns a pointer to the allocated
+/// memory.  If ptr is NULL, realloc() is identical to a call to malloc() for size bytes.
+/// If size is zero and ptr is not NULL, a new, minimum sized object is allocated and
+/// the original object is freed.
+
+/// \param mem pointer to the memory
+/// \param size in bytes
 void *realloc(void *mem, size_t size) {
 	void *dst;
 	void *actual_mem;

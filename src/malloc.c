@@ -67,31 +67,6 @@ static int prealloc(void) {
 			tmp = tmp->next;
 		}
 	}
-//	if (!g_heap.large) {
-//				g_heap.large = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-//		if (g_heap.large == MAP_FAILED) {
-//			printf("mmap failed\n");
-//			return -1;
-//		}
-//		initialize_block(g_heap.large, LARGE, large_block, 0);
-//		g_heap.large->prev = NULL;
-//		g_heap.large->next = NULL;
-//		t_block *last_block = g_heap.large;
-//		for (i = 1; i < N_BLOCKS; i++) {
-//			tmp = mmap(NULL, large_block * 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-//			if (tmp == MAP_FAILED) {
-//				printf("mmap failed\n");
-//				return -1;
-//			}
-//			initialize_block(tmp, LARGE, sizeof(t_block) + LARGE, i);
-//			last_block->next = tmp;
-//			tmp->prev = last_block;
-//			if (i == N_BLOCKS - 1) {
-//				tmp->next = NULL;
-//			}
-//			last_block = tmp;
-//		}
-//	}
 
 #ifdef MALLOC_DEBUG
 	printf("Preallocated tiny %u pages\n", TINY_ARENA / PAGE_SIZE);
