@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/10 18:16:52 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/12 12:04:42 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <unistd.h>
 # include <limits.h>
 
-# define ALIGNMENT (8)
+# define ALIGNMENT (16)
 
 /* TYPES AND STRUCTS */
 typedef struct s_block {
@@ -51,23 +51,21 @@ enum BlockType {
 #define PAGE_SIZE 4096
 
 # ifndef N_BLOCKS
-#  define N_BLOCKS 100
+#  define N_BLOCKS 128
 # endif
 
 #define OVERHEAD (sizeof(t_block) + ALIGNMENT)
 
-# define TINY (size_t)(ALIGNMENT * 2)
-# define SMALL (size_t)(TINY * 8)
-# define LARGE (size_t)(TINY * 100)
+# define TINY (size_t)8
+# define SMALL (size_t)(TINY * 16)
 
 #define TINY_ARENA (ceil((double)(TINY * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
 #define SMALL_ARENA (ceil((double)(SMALL * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
-#define LARGE_ARENA (ceil((double)(LARGE * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
 
 
 
-
-# define MUNMAP_ERROR_STRING "malloc: error: received pointer was not properly allocated\n"
+# define MMAP_ERROR_STRING "error: mmap failed\n"
+# define MUNMAP_ERROR_STRING "error: received pointer was not properly allocated\n"
 
 # define BLUE "\e[1;34m"
 # define GREEN "\033[32m"

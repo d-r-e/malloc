@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/08 14:05:11 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/12 11:48:02 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,19 @@ bool is_allocated(t_block *ptr) {
 	t_block *tmp;
 
 	tmp = g_heap.tiny;
-	while (tmp) {
+	while (tmp && ptr->size == TINY) {
 		if (tmp == ptr)
 			return true;
 		tmp = tmp->next;
 	}
 	tmp = g_heap.small;
-	while (tmp) {
+	while (tmp && ptr->size ==  SMALL) {
 		if (tmp == ptr)
 			return true;
 		tmp = tmp->next;
 	}
 	tmp = g_heap.large;
-	while (tmp) {
+	while (tmp && ptr->size > SMALL) {
 		if (tmp == ptr)
 			return true;
 		tmp = tmp->next;
@@ -51,8 +51,8 @@ void *realloc(void *mem, size_t size) {
 	actual_mem = disalign_memory(mem, ALIGNMENT);
 	tmp = (t_block *) actual_mem - 1;
 	if (!is_allocated(tmp))
-		return NULL;
-	if (tmp->size != SMALL && tmp->size != TINY && tmp->size < LARGE)
+		return malloc(size);
+	if (tmp->size != SMALL && tmp->size != TINY && tmp->size < SMALL)
 		return NULL;
 	if (size <= TINY && tmp->size == TINY)
 		return mem;

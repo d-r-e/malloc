@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:14:16 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/08 14:04:31 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/12 12:03:53 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
-void clear_chunk(size_t size){
+void clear_chunk(size_t size) {
 	t_block *ptr;
 	size_t counter = 0;
 	size_t i = 0;
@@ -33,22 +33,24 @@ void clear_chunk(size_t size){
 		else
 			break;
 		if (counter == N_BLOCKS) {
-			if (size <= TINY){
+			if (size <= TINY) {
 				ptr = ptr->next;
 				ret = munmap((void *) g_heap.tiny, TINY_ARENA);
 				if (ret) {
 					ft_puts(MUNMAP_ERROR_STRING);
-					exit(254);
+					exit(253);
 				}
 				g_heap.tiny = ptr;
-			}
-			else if (size <= SMALL){
-				ptr = ptr->next;
+			} else if (size <= SMALL) {
+				if (ptr->next)
+					ptr = ptr->next;
+				else ptr=NULL;
 				ret = munmap((void *) g_heap.small, SMALL_ARENA);
 				if (ret) {
-					ft_puts(MUNMAP_ERROR_STRING);
+					dprintf(2, "Error: %s for size %zu\n", MUNMAP_ERROR_STRING, size);
 					exit(254);
 				}
+
 				g_heap.small = ptr;
 			}
 
@@ -57,7 +59,31 @@ void clear_chunk(size_t size){
 		++i;
 		ptr = ptr->next;
 	}
+}
 
+
+bool is_block_allocated(t_block *block){
+	t_block *tmp;
+
+	tmp = g_heap.tiny;
+	while (tmp && block->size == TINY) {
+		if (tmp == block)
+			return true;
+		tmp = tmp->next;
+	}
+	tmp = g_heap.small;
+	while (tmp && block->size ==  SMALL) {
+		if (tmp == block)
+			return true;
+		tmp = tmp->next;
+	}
+	tmp = g_heap.large;
+	while (tmp && block->size > SMALL) {
+		if (tmp == block)
+			return true;
+		tmp = tmp->next;
+	}
+	return false;
 }
 
 void free(void *ptr) {
@@ -68,40 +94,32 @@ void free(void *ptr) {
 		return;
 	ptr = disalign_memory(ptr, ALIGNMENT);
 	block = (t_block *) ptr - 1;
-	block->inuse = false;
+	if (block->inuse == false || !is_block_allocated(block))
+		return;
 
-	if (block->size == LARGE) {
-		if (block->prev)
-			block->prev->next = block->next;
-		if (block->next)
-			block->next->prev = block->prev;
-		if (!block->prev)
-			g_heap.large = block->next;
+//	if (block->size > SMALL)
+//		show_alloc_mem();
+	if (block) {
+		if (block->size > SMALL && block->size <= SIZE_MAX) {
+//			printf("block->prev %p\n", block->prev);
+//			printf("block->next %p\n", block->next);
 
-		if (munmap((void *) block, sizeof(t_block) + block->size + ALIGNMENT)) {
-			ft_puts(MUNMAP_ERROR_STRING);
-			ret = ft_strlen(MUNMAP_ERROR_STRING);
-			exit(ret);
+			if (block->prev)
+				block->prev->next = block->next ? block->next : NULL;
+			else
+				g_heap.large = block->next ? block->next : NULL;
+
+			if (block->next)
+				block->next->prev = block->prev;
+			block->inuse = false;
+			if (munmap((void *) block, block->size + OVERHEAD)) {
+				dprintf(2, "free: %s for size %lu\n", MUNMAP_ERROR_STRING, block->size);
+				ret = ft_strlen(MUNMAP_ERROR_STRING);
+				exit(252);
+			}
+		} else if (block) {
+			clear_chunk(block->size);
+//			ft_puts("clear chunk succeeded");
 		}
 	}
-	else if (block){
-		clear_chunk(block->size);
-	}
-
-//	else if (block->size == TINY && check_last_n_blocks_not_inuse(g_heap.tiny)) {
-//
-//		ret = munmap((void *) g_heap.tiny, N_BLOCKS * (sizeof(t_block *) + TINY));
-//		if (ret) {
-//			ft_puts(MUNMAP_ERROR_STRING);
-//			exit(-1);
-//		}
-//		g_heap.tiny = NULL;
-//	} else if (block->size == SMALL && check_last_n_blocks_not_inuse(g_heap.small)) {
-//		ret = munmap((void *) g_heap.small, N_BLOCKS * (sizeof(t_block *) + SMALL));
-//		if (ret) {
-//			ft_puts(MUNMAP_ERROR_STRING);
-//			exit(-1);
-//		}
-//		g_heap.small = NULL;
-//	}
 }

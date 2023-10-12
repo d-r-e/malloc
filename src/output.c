@@ -6,7 +6,7 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 00:42:42 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/06 18:41:20 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/12 11:47:04 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void show_alloc_mem()
     while (tmp){
         printf("%5d · %p - %p : %3lu bytes\n", i,
                (void *)((char *)tmp + sizeof(t_block)),
-               (void *)((char *)tmp + sizeof(t_block) + LARGE),
+               (void *)((char *)tmp + sizeof(t_block) + tmp->size),
                tmp->size);
         tmp = tmp->next;
         ++i;
@@ -114,7 +114,7 @@ void show_alloc_mem_ex()
 		ft_putstr(GREEN);
 		printf("%5d · %p - %p : %5lu bytes ", i,
 			   (void *)((char *)tmp + sizeof(t_block)),
-			   (void *)((char *)tmp + sizeof(t_block) + LARGE),
+			   (void *)((char *)tmp + sizeof(t_block) + tmp->size),
 			   tmp->size);
 		if (tmp->size > 0)
 			hexdump((void *)((char *)tmp + sizeof(t_block)), tmp->size);
