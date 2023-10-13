@@ -6,7 +6,8 @@
 #include <time.h>
 
 #define MIN_ITER 2000
-#define MAX_ITER 5000000
+
+#define MAX_ITER 500000
 #define MIN_SIZE 1
 #define MAX_SIZE 999999
 #define LARGE_SIZE 100000000
