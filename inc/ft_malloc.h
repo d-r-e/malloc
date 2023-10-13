@@ -23,7 +23,7 @@
 # include <unistd.h>
 # include <limits.h>
 
-# define ALIGNMENT 16
+# define ALIGNMENT 8
 
 /* TYPES AND STRUCTS */
 typedef struct s_block {
@@ -47,6 +47,7 @@ enum BlockType {
 };
 
 # define ceil(x) ((x - (int)(x)) > 0 ? (int)(x + 1) : (int)(x))
+# define min(x, y) (x < y ? x : y)
 
 # define PAGE_SIZE 4096
 

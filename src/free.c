@@ -97,15 +97,15 @@ bool is_block_allocated(t_block *block){
 ///   If ptr is a NULL pointer, no operation is performed.
 /// \param ptr
 void free(void *ptr) {
-	t_block *block;
+	t_block *block = NULL;
 
 	if (!ptr)
 		return;
-	ptr = disalign_memory(ptr, ALIGNMENT);
-	block = (t_block *) ptr - 1;
+	block = disalign_memory(ptr, ALIGNMENT);
+	block = block - 1;
 	if (block->inuse == false || !is_block_allocated(block))
 		return;
-
+	block->inuse = false;
 
 	if (block) {
 		if (block->size > SMALL && block->size <= SIZE_MAX) {
@@ -121,7 +121,7 @@ void free(void *ptr) {
 				dprintf(2, "free: %s for size %lu\n", MUNMAP_ERROR_STRING, block->size);
 				exit(252);
 			}
-		} else if (block) {
+		} else if (block->size <= SMALL) {
 			clear_chunk(block->size);
 		}
 	}

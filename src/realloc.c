@@ -19,7 +19,7 @@ static void *disalign_memory(void *mem, size_t alignment) {
 
 static
 bool is_allocated(t_block *ptr) {
-	t_block *tmp;
+	t_block *tmp = NULL;
 
 	tmp = g_heap.tiny;
 	while (tmp && ptr->size == TINY) {
@@ -42,8 +42,41 @@ bool is_allocated(t_block *ptr) {
 	return false;
 }
 
+static bool is_inside_heap(void *ptr){
+
+	void *tmp = g_heap.tiny;
+	t_block *block = NULL;
+
+	while (tmp) {
+		block = tmp;
+		if (ptr >= (void *) block && ptr <= (void *) block + TINY_ARENA)
+			return true;
+		tmp = block->next;
+	}
+
+	tmp = g_heap.small;
+
+	while (tmp) {
+		block = tmp;
+		if (ptr >= (void *) block && ptr <= (void *) block + SMALL_ARENA)
+			return true;
+		tmp = block->next;
+	}
+
+	tmp = g_heap.large;
+
+	while (tmp) {
+		block = tmp;
+		if (ptr >= (void *) block && ptr <= (void *) block + block->size + OVERHEAD)
+			return true;
+		tmp = block->next;
+	}
+	return false;
+}
+
 /// \brief
 ///  Reallocates a memory block
+/// \author Darodrig
 /// \details
 ///  The realloc() function tries to change the size of the allocation pointed
 /// to by ptr to size, and returns ptr. If there is not enough room to enlarge
@@ -57,29 +90,29 @@ bool is_allocated(t_block *ptr) {
 /// \param mem pointer to the memory
 /// \param size in bytes
 void *realloc(void *mem, size_t size) {
-	void *dst;
-	void *actual_mem;
-	t_block *tmp;
+	t_block *ptr = NULL;
 
 	if (!mem)
 		return malloc(size);
-	actual_mem = disalign_memory(mem, ALIGNMENT);
-	tmp = (t_block *) actual_mem - 1;
-	if (!is_allocated(tmp))
-		return malloc(size);
-	if (tmp->size != SMALL && tmp->size != TINY && tmp->size < SMALL)
+	if (size == 0) {
+		free(mem);
 		return NULL;
-	if (size <= TINY && tmp->size == TINY)
-		return mem;
-	if (size > TINY && size <= SMALL && tmp->size == SMALL)
-		return mem;
-	dst = malloc(size);
-	if (!dst)
+	}
+	mem = (t_block *) disalign_memory(mem, ALIGNMENT);
+	ptr = (void*)mem - sizeof(t_block);
+	if (!is_allocated(ptr) || !is_inside_heap(ptr)) {
 		return NULL;
-	if (size < tmp->size)
-		ft_memmove(dst, mem, size);
-	else
-		ft_memmove(dst, mem, tmp->size);
+	}
+	if (ptr->size != SMALL && ptr->size != TINY && ptr->size < SMALL)
+		return NULL;
+	if (ptr->size >= size)
+		return mem;
+	void *new_mem = malloc(size);
+	if (!new_mem)
+		return NULL;
+	ft_memmove(new_mem, mem, ptr->size);
 	free(mem);
-	return dst;
+	return new_mem;
+
+
 }

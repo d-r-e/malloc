@@ -40,7 +40,7 @@ clean:
 
 
 test: $(TEST_SRC) $(NAME) $(HEADER)
-	$(CC) $(CFLAGS) -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
+	$(CC) $(CFLAGS)  -g3 -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
 
 test_malloc:  $(TEST_SRC)
 	$(CC) $(CFLAGS) -o ./test_malloc $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft 

@@ -16,7 +16,7 @@ t_heap g_heap = {NULL, NULL, NULL};
 
 
 static void initialize_block(t_block *block, size_t size, size_t tblock_size, int i) {
-#ifdef FILL_MEMORY
+#ifdef MALLOC_DEBUG
 	char c = 'B' + i;
 	while (!ft_isprint(c))
 		c++;
@@ -33,14 +33,14 @@ static void initialize_block(t_block *block, size_t size, size_t tblock_size, in
 static int prealloc(void) {
 	unsigned int i;
 	t_block *tmp = NULL;
-	size_t tiny_tblock = sizeof(t_block) + TINY + ALIGNMENT;
-	size_t small_tblock = sizeof(t_block) + SMALL + ALIGNMENT;
+	size_t tiny_tblock = TINY + OVERHEAD;
+	size_t small_tblock = SMALL + OVERHEAD;
 
 	if (!g_heap.tiny ) {
 		g_heap.tiny = mmap(NULL, TINY_ARENA, PROT_READ | PROT_WRITE,
 						   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.tiny == MAP_FAILED) {
-			printf("mmap failed\n");
+			ft_putstr_fd("mmap failed\n", 2);
 			return -1;
 		}
 		tmp = g_heap.tiny;
@@ -55,7 +55,7 @@ static int prealloc(void) {
 		g_heap.small = mmap(NULL, SMALL_ARENA, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 							-1, 0);
 		if (g_heap.small == MAP_FAILED) {
-			printf("mmap failed\n");
+			ft_putstr_fd("mmap failed\n", 2);
 			return -1;
 		}
 		tmp = g_heap.small;
