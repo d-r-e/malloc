@@ -27,6 +27,22 @@ void seed_rand() {
 	srand(time(NULL));
 }
 
+
+void setup_data(char *data, size_t size) {
+	for (size_t i = 0; i < size; ++i) {
+		data[i] = (char) (i % 256);
+	}
+}
+
+int verify_data(const char *data, size_t size) {
+	for (size_t i = 0; i < size; ++i) {
+		if (data[i] != (char) (i % 256)) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
 size_t get_random_number(size_t min, size_t max) {
 	return (rand() % (max - min + 1)) + min;
 }
@@ -692,50 +708,59 @@ void test_realloc_tiny_to_small() {
 
 void test_realloc_tiny_to_large() {
 	printf("Testing realloc tiny to large...\n");
+	int error = 0;
 
-	char *ptr_1;
-	char *ptr_2;
-	char *ptr_3;
-	char *ptr_4;
-
-	ptr_1 = malloc(TINY - 1);
-	ptr_2 = malloc(TINY - 1);
-	ptr_3 = malloc(TINY - 1);
-	ptr_4 = malloc(TINY - 1);
-
-	strncpy(ptr_1, "a", TINY - 1);
-	strncpy(ptr_2, "b", TINY - 1);
-	strncpy(ptr_3, "c", TINY - 1);
-	strncpy(ptr_4, "d", TINY - 1);
-
-
-	ptr_1 = realloc(ptr_1, LARGE);
-	ptr_2 = realloc(ptr_2, LARGE);
-	ptr_3 = realloc(ptr_3, LARGE);
-	ptr_4 = realloc(ptr_4, LARGE);
+	char *ptr_1 = malloc(TINY);
+	char *ptr_2 = malloc(TINY);
+	char *ptr_3 = malloc(TINY);
+	char *ptr_4 = malloc(TINY);
 
 	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
 		printf(RED "Memory allocation error\n" RESET);
-	// now check them all
-	for (int i = 0; i < (int) (TINY - 2); i++) {
-		if (ptr_1[i] != 'a')
-			printf(RED "Memory overwrite error\n" RESET);
-		if (ptr_2[i] != 'b')
-			printf(RED "Memory overwrite error\n" RESET);
-		if (ptr_3[i] != 'c')
-			printf(RED "Memory overwrite error\n" RESET);
-		if (ptr_4[i] != 'd')
-			printf(RED "Memory overwrite error\n" RESET);
+	strcpy(ptr_1, "a");
+	strcpy(ptr_2, "b");
+	strcpy(ptr_3, "c");
+	strcpy(ptr_4, "d");
+
+	char *ptr_5 = realloc(ptr_1, LARGE);
+	char *ptr_6 = realloc(ptr_2, LARGE);
+	char *ptr_7 = realloc(ptr_3, LARGE);
+	char *ptr_8 = realloc(ptr_4, LARGE);
+
+
+	if (!ptr_5 || !ptr_6 || !ptr_7 || !ptr_8)
+		printf(RED "Memory allocation error\n" RESET);
+
+	if (strcmp(ptr_5, "a") || strcmp(ptr_6, "b") || strcmp(ptr_7, "c") || strcmp(ptr_8, "d"))
+		printf(RED "Error copying data\n" RESET);
+
+	ft_memcpy(ptr_5, "a", LARGE);
+	ft_memcpy(ptr_6, "b", LARGE);
+	ft_memcpy(ptr_7, "c", LARGE);
+	ft_memcpy(ptr_8, "d", LARGE);
+
+	// fill with memory
+	for (int i = 0; i < LARGE; i++) {
+		ptr_5[i] = 'a';
+		ptr_6[i] = 'b';
+		ptr_7[i] = 'c';
+		ptr_8[i] = 'd';
 	}
 
+	for (int i = 0; i < LARGE; i++) {
+		if (ptr_5[i] != 'a' || ptr_6[i] != 'b' || ptr_7[i] != 'c' || ptr_8[i] != 'd')
+			error = 1;
+	}
 
-	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
-		printf(RED "Memory allocation error\n" RESET);
-	free(ptr_1);
-	free(ptr_2);
-	free(ptr_3);
-	free(ptr_4);
-	printf(GREEN "Test realloc tiny to large OK\n" RESET);
+	free(ptr_5);
+	free(ptr_6);
+	free(ptr_7);
+	free(ptr_8);
+
+	if (!error)
+		printf(GREEN "Test realloc tiny to large OK\n" RESET);
+	else
+		printf(RED "Error copying data\n" RESET);
 }
 
 void test_random_realloc_level_one() {
@@ -747,10 +772,10 @@ void test_random_realloc_level_one() {
 	char *ptr_4;
 
 
-	ptr_1 = malloc(TINY - 1);
-	ptr_2 = malloc(TINY - 1);
-	ptr_3 = malloc(TINY - 1);
-	ptr_4 = malloc(TINY - 1);
+	ptr_1 = malloc(8);
+	ptr_2 = malloc(8);
+	ptr_3 = malloc(8);
+	ptr_4 = malloc(8);
 
 	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
 		printf(RED "Memory allocation error\n" RESET);
@@ -767,13 +792,12 @@ void test_random_realloc_level_one() {
 
 	ptr_5 = realloc(ptr_1, 16);
 	ptr_6 = realloc(ptr_2, 16);
-	ptr_3 = realloc(ptr_3, 16);
-	ptr_4 = realloc(ptr_4, 16);
+	ptr_7 = realloc(ptr_3, 16);
+	ptr_8 = realloc(ptr_4, 16);
 
 	if (!ptr_5 || !ptr_6 || !ptr_3 || !ptr_4)
 		printf(RED "Memory allocation error\n" RESET);
 
-	// now check them all
 	if (ptr_5[0] != 'a')
 		printf(RED "Memory overwrite error level one %c\n" RESET, ptr_5[0]);
 	if (ptr_6[0] != 'b')
@@ -782,7 +806,6 @@ void test_random_realloc_level_one() {
 		printf(RED "Memory overwrite error level one %c\n" RESET, ptr_7[0]);
 	if (ptr_8[0] != 'd')
 		printf(RED "Memory overwrite error level one %c\n" RESET, ptr_8[0]);
-
 
 
 	printf(GREEN "Test random realloc level one OK\n" RESET);
@@ -914,40 +937,50 @@ void test_return_100_mallocs_to_the_same_ptr() {
 	printf(GREEN "Test return 100 mallocs to the same ptr OK\n" RESET);
 }
 
+void test_undefined() {
+	char *addr;
+
+	addr = malloc(16);
+	free(NULL);
+	free((void *) addr + 5);
+	if (realloc((void *) addr + 5, 10) == NULL)
+		printf(GREEN "Test undefined OK\n" RESET);
+	else
+		printf(RED "Test undefined KO\n" RESET);
+}
+
 int main() {
-//	test_malloc_small();
-//	test_four_mallocs();
-//	test_malloc_large();
-//	test_double_array_small();
-//
-//	test_double_array();
-//	test_integer_array();
-//	test_large_memory_copy();
-//	test_memory_overwrite_small();
-//	test_memory_overwrite();
-//	//	 test_stress_malloc();
-//	test_negative();
-//	test_zero();
-//	test_mem_alignment();
-//	test_mem_alignment_extensive();
-//	test_malloc_with_double_arr_integers();
-//	test_thousand_hundred_mallocs();
-//	test_thousand_hundred_mallocs_write_read();
-//	test_million_mallocs();
-//	test_gazillion_mallocs();
-//	test_x();
-//	test_return_100_mallocs_to_the_same_ptr();
-//	// test_alloc_random_file();
-//	test_simple_realloc();
+	test_malloc_small();
+	test_four_mallocs();
+	test_malloc_large();
+	test_double_array_small();
+
+	test_double_array();
+	test_integer_array();
+	test_large_memory_copy();
+	test_memory_overwrite_small();
+	test_memory_overwrite();
+	test_stress_malloc();
+	test_negative();
+	test_zero();
+	test_mem_alignment();
+	test_mem_alignment_extensive();
+	test_malloc_with_double_arr_integers();
+	test_thousand_hundred_mallocs();
+	test_thousand_hundred_mallocs_write_read();
+	test_million_mallocs();
+	test_gazillion_mallocs();
+	test_x();
+	test_return_100_mallocs_to_the_same_ptr();
+	// test_alloc_random_file();
+	test_simple_realloc();
 	test_random_realloc_level_one();
 	test_realloc_tiny_to_small();
 	test_realloc_tiny_to_large();
-	// system("leaks test");`
-
 	test_realloc_expanding();
 	test_realloc_shrinking();
 	test_realloc_zero_size();
 	test_realloc_null_ptr();
-
+	//	system("leaks test");
 	return 0;
 }
