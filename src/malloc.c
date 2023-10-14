@@ -111,7 +111,13 @@ static int extend_heap(t_block *mem, size_t size) {
 }
 
 static void *get_aligned_pointer(void *mem, size_t alignment) {
-	return (void *) (((size_t) mem + alignment - 1) & ~(alignment - 1));
+	void * ptr = mem;
+	if ((size_t) mem % alignment != 0) {
+		ptr = (void *) ((size_t) mem + (alignment - ((size_t) mem % alignment)));
+	} else {
+		ptr = mem;
+	}
+	return ptr;
 }
 
 

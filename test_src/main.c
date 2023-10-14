@@ -700,19 +700,19 @@ void test_simple_realloc() {
 	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
 		printf(RED "Memory allocation error\n" RESET);
 
-	ft_strncpy(ptr_1, "a", 1);
-	ft_strncpy(ptr_2, "b", 1);
-	ft_strncpy(ptr_3, "c", 1);
-	ft_strncpy(ptr_4, "d", 1);
+	ft_strncpy(ptr_1, "aaa", 4);
+	ft_strncpy(ptr_2, "bbb", 4);
+	ft_strncpy(ptr_3, "ccc", 4);
+	ft_strncpy(ptr_4, "ddd", 4);
 
 
-	ptr_5 = realloc(ptr_1, 2);
-	ptr_6 = realloc(ptr_2, 2);
-	ptr_7 = realloc(ptr_3, 2);
-	ptr_8 = realloc(ptr_4, 2);
+	ptr_5 = realloc(ptr_1, 64);
+	ptr_6 = realloc(ptr_2, 64);
+	ptr_7 = realloc(ptr_3, 64);
+	ptr_8 = realloc(ptr_4, 64);
 
 	if (!ptr_5 || !ptr_6 || !ptr_7 || !ptr_8){
-		printf(RED "Memory allocation error\n" RESET);
+		printf(RED "Memory reallocation error\n" RESET);
 		error = 1;
 	}
 

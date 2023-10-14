@@ -13,7 +13,7 @@
 #include <ft_malloc.h>
 #include <libft.h>
 
-static void *disalign_memory(void *mem, size_t alignment) {
+static inline void *disalign_memory(void *mem, size_t alignment) {
 	return (void *) ((size_t) mem & ~(alignment - 1));
 }
 
