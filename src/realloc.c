@@ -86,7 +86,6 @@ static bool is_inside_heap(void *ptr){
 /// memory.  If ptr is NULL, realloc() is identical to a call to malloc() for size bytes.
 /// If size is zero and ptr is not NULL, a new, minimum sized object is allocated and
 /// the original object is freed.
-
 /// \param mem pointer to the memory
 /// \param size in bytes
 void *realloc(void *mem, size_t size) {
@@ -94,6 +93,8 @@ void *realloc(void *mem, size_t size) {
 
 	if (!mem)
 		return malloc(size);
+	if ((size_t) mem % ALIGNMENT != 0)
+		return NULL;
 	if (size == 0) {
 		free(mem);
 		return NULL;

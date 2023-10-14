@@ -173,7 +173,8 @@ void *malloc(size_t size) {
 		while(ptr && ptr->next)
 			ptr = ptr->next;
 		size_t total = size + OVERHEAD;
-
+		if (total % ALIGNMENT != 0)
+			total += ALIGNMENT - (total % ALIGNMENT);
 #ifdef MALLOC_DEBUG
 		total_memory_allocated += total;
 #endif

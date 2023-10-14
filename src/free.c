@@ -124,7 +124,7 @@ bool is_block_allocated(t_block *block){
 void free(void *ptr) {
 	t_block *block = NULL;
 
-	if (!ptr)
+	if (!ptr || (size_t) ptr % ALIGNMENT)
 		return;
 	block = disalign_memory(ptr, ALIGNMENT);
 	block = block - 1;
@@ -145,7 +145,10 @@ void free(void *ptr) {
 #ifdef MALLOC_DEBUG
 			total_memory_freed += block->size + OVERHEAD;
 #endif
-			if (munmap((void *) block, block->size + OVERHEAD)) {
+			size_t total_size = block->size + OVERHEAD;
+			if (total_size % ALIGNMENT)
+				total_size += ALIGNMENT - (total_size % ALIGNMENT);
+			if (munmap((void *) block, total_size)) {
 				dprintf(2, "free: %s for size %lu\n", MUNMAP_ERROR_STRING, block->size);
 				exit(252);
 			}

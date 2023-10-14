@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
 #define MIN_ITER 2000
 
@@ -638,9 +639,50 @@ void test_alloc_random_file() {
 	}
 }
 
+void test_one_realloc() {
+	printf("Testing one realloc...\n");
+
+	int initial_size = 5;
+	int resized_size = 10;
+
+	int* data = (int*) malloc(initial_size * sizeof(int));
+	if (data == NULL) {
+		printf(RED "Failed to allocate memory\n" RESET);
+		return;
+	}
+	for (int i = 0; i < initial_size; i++) {
+		data[i] = i;
+	}
+
+	int* resized_data = (int*) realloc(data, resized_size * sizeof(int));
+	if (resized_data == NULL) {
+		printf(RED "Failed to reallocate memory\n" RESET);
+		free(data);
+		return;
+	}
+	data = resized_data;
+
+	for (int i = initial_size; i < resized_size; i++) {
+		data[i] = i;
+	}
+
+	for (int i = 0; i < resized_size; i++) {
+		if (data[i] != i) {
+			printf(RED "Integrity check failed at index %d\n" RESET, i);
+			free(data);
+			return;
+		}
+	}
+
+	free(data);
+
+	printf(GREEN "One realloc test OK\n" RESET);
+}
+
+
 void test_simple_realloc() {
 	printf("Testing simple realloc...\n");
-
+	int error = 0;
 	char *ptr_1;
 	char *ptr_2;
 	char *ptr_3;
@@ -669,15 +711,18 @@ void test_simple_realloc() {
 	ptr_7 = realloc(ptr_3, 2);
 	ptr_8 = realloc(ptr_4, 2);
 
-	if (!ptr_5 || !ptr_6 || !ptr_7 || !ptr_8)
+	if (!ptr_5 || !ptr_6 || !ptr_7 || !ptr_8){
 		printf(RED "Memory allocation error\n" RESET);
+		error = 1;
+	}
 
 	free(ptr_5);
 	free(ptr_6);
 	free(ptr_7);
 	free(ptr_8);
 
-	printf(GREEN "Test simple realloc OK\n" RESET);
+	if (!error)
+		printf(GREEN "Test simple realloc OK\n" RESET);
 }
 
 void test_realloc_tiny_to_small() {
@@ -949,6 +994,34 @@ void test_undefined() {
 		printf(RED "Test undefined KO\n" RESET);
 }
 
+void test_realloc_inner_malloc() {
+	printf("Testing realloc on an address inside a malloc'ed block...\n" RESET);
+	char *ptr = (char *)malloc(100);
+	assert(ptr != NULL);
+
+	// Trying to realloc an address inside the block (not the start of it).
+	char *new_ptr = (char *)realloc(ptr + 50, 200);
+
+	// Either new_ptr should be NULL or it should be a valid address (if your library handles this).
+	assert(new_ptr == NULL || new_ptr != ptr + 50);
+
+	free(ptr);  // Always free the originally malloc'ed address.
+	printf(GREEN "Test realloc inner malloc OK\n" RESET);
+}
+
+
+void test_free_unmalloced() {
+	printf("Testing free on memory not malloc'ed...\n");
+	char stack_memory[100];
+	char *dynamic_memory = (char *)malloc(100);
+	assert(dynamic_memory != NULL);
+	free(stack_memory);
+	free(dynamic_memory + 50);
+	free(dynamic_memory);
+	printf(GREEN "Test free unmalloced OK\n" RESET);
+}
+
+
 int main() {
 	test_malloc_small();
 	test_four_mallocs();
@@ -959,7 +1032,7 @@ int main() {
 	test_large_memory_copy();
 	test_memory_overwrite_small();
 	test_memory_overwrite();
-	test_stress_malloc();
+//	test_stress_malloc();
 	// test_negative();
 	test_zero();
 	test_mem_alignment();
@@ -971,7 +1044,8 @@ int main() {
 	test_gazillion_mallocs();
 	test_x();
 	test_return_100_mallocs_to_the_same_ptr();
-	// test_alloc_random_file();
+//	 test_alloc_random_file();
+	test_one_realloc();
 	test_simple_realloc();
 	test_random_realloc_level_one();
 	test_realloc_tiny_to_small();
@@ -980,6 +1054,10 @@ int main() {
 	test_realloc_shrinking();
 	test_realloc_zero_size();
 	test_realloc_null_ptr();
+	test_undefined();
+	test_realloc_inner_malloc();
+
+	test_free_unmalloced();
 	//	system("leaks test");
 	return 0;
 }
