@@ -52,7 +52,7 @@ enum BlockType {
 # define PAGE_SIZE 4096
 
 # ifndef N_BLOCKS
-#  define N_BLOCKS 128
+#  define N_BLOCKS 100
 # endif
 
 #define OVERHEAD (sizeof(t_block) + ALIGNMENT)

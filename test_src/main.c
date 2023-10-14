@@ -985,6 +985,7 @@ void test_return_100_mallocs_to_the_same_ptr() {
 void test_undefined() {
 	char *addr;
 
+	printf("Testing undefined behavior...\n");
 	addr = malloc(16);
 	free(NULL);
 	free((void *) addr + 5);
@@ -999,13 +1000,10 @@ void test_realloc_inner_malloc() {
 	char *ptr = (char *)malloc(100);
 	assert(ptr != NULL);
 
-	// Trying to realloc an address inside the block (not the start of it).
 	char *new_ptr = (char *)realloc(ptr + 50, 200);
-
-	// Either new_ptr should be NULL or it should be a valid address (if your library handles this).
 	assert(new_ptr == NULL || new_ptr != ptr + 50);
 
-	free(ptr);  // Always free the originally malloc'ed address.
+	free(ptr);
 	printf(GREEN "Test realloc inner malloc OK\n" RESET);
 }
 
