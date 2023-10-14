@@ -6,11 +6,19 @@
 /*   By: darodrig <darodrig@42madrid.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:14:16 by darodrig          #+#    #+#             */
-/*   Updated: 2023/10/12 12:03:53 by darodrig         ###   ########.fr       */
+/*   Updated: 2023/10/14 11:55:40 by darodrig         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <ft_malloc.h>
+
+#ifdef MALLOC_DEBUG
+	extern size_t total_memory_allocated;
+	extern size_t total_pages_allocated;
+	size_t total_memory_freed = 0;
+#endif
+
+
 
 static
 void *disalign_memory(void *mem, size_t alignment) {
@@ -23,6 +31,7 @@ void clear_chunk(size_t size) {
 	size_t counter = 0;
 	size_t i = 0;
 	int ret = 0;
+	bool chunk_freed = false;
 
 	if (size <= TINY)
 		ptr = g_heap.tiny;
@@ -38,30 +47,46 @@ void clear_chunk(size_t size) {
 		if (counter == N_BLOCKS) {
 			if (size <= TINY) {
 				ptr = ptr->next;
+#ifdef MALLOC_DEBUG
+				total_memory_freed += TINY_ARENA;
+#endif
 				ret = munmap((void *) g_heap.tiny, TINY_ARENA);
 				if (ret) {
 					dprintf(2, "Error: %s for size %zu\n", MUNMAP_ERROR_STRING, size);
 					exit(253);
 				}
+				chunk_freed = true;
 				g_heap.tiny = ptr;
 			} else if (size <= SMALL) {
 				if (ptr->next)
 					ptr = ptr->next;
 				else ptr=NULL;
+#ifdef MALLOC_DEBUG
+				total_memory_freed += SMALL_ARENA;
+#endif
 				ret = munmap((void *) g_heap.small, SMALL_ARENA);
 				if (ret) {
 					dprintf(2, "Error: %s for size %zu\n", MUNMAP_ERROR_STRING, size);
 					exit(254);
 				}
-
+				chunk_freed = true;
 				g_heap.small = ptr;
 			}
-
 			break;
 		}
 		++i;
 		ptr = ptr->next;
 	}
+	if (chunk_freed){
+		clear_chunk(TINY);
+		clear_chunk(SMALL);
+	}
+#ifdef MALLOC_DEBUG
+	printf("Freeing %zu bytes\n", size);
+	printf("Total memory allocated: %zu\n", total_memory_allocated);
+	printf("Total memory freed: %zu\n", total_memory_freed);
+#endif
+
 }
 
 static
@@ -117,6 +142,9 @@ void free(void *ptr) {
 			if (block->next)
 				block->next->prev = block->prev;
 			block->inuse = false;
+#ifdef MALLOC_DEBUG
+			total_memory_freed += block->size + OVERHEAD;
+#endif
 			if (munmap((void *) block, block->size + OVERHEAD)) {
 				dprintf(2, "free: %s for size %lu\n", MUNMAP_ERROR_STRING, block->size);
 				exit(252);

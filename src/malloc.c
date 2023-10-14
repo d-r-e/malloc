@@ -14,14 +14,12 @@
 
 t_heap g_heap = {NULL, NULL, NULL};
 
+#ifdef MALLOC_DEBUG
+size_t total_memory_allocated = 0;
+#endif
+
 
 static void initialize_block(t_block *block, size_t size, size_t tblock_size, int i) {
-#ifdef MALLOC_DEBUG
-	char c = 'B' + i;
-	while (!ft_isprint(c))
-		c++;
-	ft_memset((void *) ((char *) block + sizeof(t_block)), c, size);
-#endif
 	block->size = size;
 	block->inuse = false;
 	if (size <= SMALL) {
@@ -37,6 +35,14 @@ static int prealloc(void) {
 	size_t small_tblock = SMALL + OVERHEAD;
 
 	if (!g_heap.tiny ) {
+#ifdef MALLOC_DEBUG
+		ft_putstr_fd("Preallocating ", 2);
+		ft_putnbr_fd(TINY_ARENA, 2);
+		ft_putstr_fd("\n", 2);
+		total_memory_allocated += TINY_ARENA;
+		printf("total_memory_allocated: %zu\n", total_memory_allocated);
+#endif
+
 		g_heap.tiny = mmap(NULL, TINY_ARENA, PROT_READ | PROT_WRITE,
 						   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (g_heap.tiny == MAP_FAILED) {
@@ -52,6 +58,11 @@ static int prealloc(void) {
 		}
 	}
 	if (!g_heap.small) {
+#ifdef MALLOC_DEBUG
+		total_memory_allocated += SMALL_ARENA;
+
+		printf("total_memory_allocated: %zu ", total_memory_allocated);
+#endif
 		g_heap.small = mmap(NULL, SMALL_ARENA, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 							-1, 0);
 		if (g_heap.small == MAP_FAILED) {
@@ -66,15 +77,6 @@ static int prealloc(void) {
 			tmp = tmp->next;
 		}
 	}
-
-#ifdef MALLOC_DEBUG
-	printf("Preallocated tiny %u pages\n", TINY_ARENA / PAGE_SIZE);
-	if (TINY_ARENA % PAGE_SIZE)
-		printf("Warning: TINY_ARENA is not a multiple of page size\n");
-	printf("Preallocated small %u pages\n", SMALL_ARENA / PAGE_SIZE);
-	if (SMALL_ARENA % PAGE_SIZE)
-		printf("Warning: SMALL_ARENA is not a multiple of page size\n");
-#endif
 	return 0;
 }
 
@@ -88,6 +90,11 @@ static int extend_heap(t_block *mem, size_t size) {
 		size_to_extend = TINY_ARENA;
 	else if (size <= SMALL)
 		size_to_extend = SMALL_ARENA;
+
+#ifdef MALLOC_DEBUG
+	total_memory_allocated += size_to_extend;
+	printf("total_memory_allocated: %zu\n", total_memory_allocated);
+#endif
 	tmp = mmap(NULL, size_to_extend, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (tmp == MAP_FAILED) {
 		printf("mmap failed\n");
@@ -156,9 +163,6 @@ void *malloc(size_t size) {
 		while (ptr) {
 			if (ptr->inuse == false && size <= ptr->size) {
 				ptr->inuse = true;
-#ifdef MALLOC_DEBUG
-				MALLOC_DEBUG_PRINT("malloc: debug: found block: %p\n", &ptr);
-#endif
 				return get_aligned_pointer((void *) ((char *) ptr + sizeof(t_block)), ALIGNMENT);
 			}
 			if (ptr->next)
@@ -169,6 +173,10 @@ void *malloc(size_t size) {
 		while(ptr && ptr->next)
 			ptr = ptr->next;
 		size_t total = size + OVERHEAD;
+
+#ifdef MALLOC_DEBUG
+		total_memory_allocated += total;
+#endif
 
 		t_block *new_block = mmap(NULL, total,
 								  PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

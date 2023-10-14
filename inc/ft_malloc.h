@@ -60,8 +60,8 @@ enum BlockType {
 # define TINY (size_t)8
 # define SMALL (size_t)(TINY * 128)
 
-# define TINY_ARENA (ceil((double)(TINY * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
-# define SMALL_ARENA (ceil((double)(SMALL * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
+# define TINY_ARENA (size_t)(ceil((double)(TINY * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
+# define SMALL_ARENA (size_t)(ceil((double)(SMALL * N_BLOCKS + OVERHEAD * N_BLOCKS) / PAGE_SIZE) * PAGE_SIZE)
 
 # define MMAP_ERROR_STRING "error: mmap failed\n"
 # define MUNMAP_ERROR_STRING "error: received pointer was not properly allocated\n"

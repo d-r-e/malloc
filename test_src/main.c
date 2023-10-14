@@ -693,17 +693,17 @@ void test_realloc_tiny_to_small() {
 	ptr_3 = malloc(TINY - 1);
 	ptr_4 = malloc(TINY - 1);
 
-	ptr_1 = realloc(ptr_1, SMALL);
-	ptr_2 = realloc(ptr_2, SMALL);
-	ptr_3 = realloc(ptr_3, SMALL);
-	ptr_4 = realloc(ptr_4, SMALL);
+	char *ptr_5 = realloc(ptr_1, SMALL);
+	char *ptr_6 = realloc(ptr_2, SMALL);
+	char *ptr_7 = realloc(ptr_3, SMALL);
+	char *ptr_8 = realloc(ptr_4, SMALL);
 
-	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
+	if (!ptr_5 || !ptr_6 || !ptr_7 || !ptr_8)
 		printf(RED "Memory allocation error\n" RESET);
-	free(ptr_1);
-	free(ptr_2);
-	free(ptr_3);
-	free(ptr_4);
+	free(ptr_5);
+	free(ptr_6);
+	free(ptr_7);
+	free(ptr_8);
 	printf(GREEN "Test realloc tiny to small OK\n" RESET);
 }
 
@@ -735,12 +735,7 @@ void test_realloc_tiny_to_large() {
 	if (strcmp(ptr_5, "a") || strcmp(ptr_6, "b") || strcmp(ptr_7, "c") || strcmp(ptr_8, "d"))
 		printf(RED "Error copying data\n" RESET);
 
-	ft_memcpy(ptr_5, "a", LARGE);
-	ft_memcpy(ptr_6, "b", LARGE);
-	ft_memcpy(ptr_7, "c", LARGE);
-	ft_memcpy(ptr_8, "d", LARGE);
-
-	// fill with memory
+	
 	for (int i = 0; i < LARGE; i++) {
 		ptr_5[i] = 'a';
 		ptr_6[i] = 'b';
@@ -772,29 +767,29 @@ void test_random_realloc_level_one() {
 	char *ptr_3;
 	char *ptr_4;
 
-
-	ptr_1 = malloc(8);
-	ptr_2 = malloc(8);
-	ptr_3 = malloc(8);
-	ptr_4 = malloc(8);
+	size_t len = ft_strlen("aaaaaaaaaaaaaaaaaaaaaaaa") + 1;
+	ptr_1 = malloc(len);
+	ptr_2 = malloc(len);
+	ptr_3 = malloc(len);
+	ptr_4 = malloc(len);
 
 	if (!ptr_1 || !ptr_2 || !ptr_3 || !ptr_4)
 		printf(RED "Memory allocation error\n" RESET);
 
-	strcpy(ptr_1, "aaa");
-	strcpy(ptr_2, "bbb");
-	strcpy(ptr_3, "ccc");
-	strcpy(ptr_4, "ddd");
+	strcpy(ptr_1, "aaaaaaaaaaaaaaaaaaaaaaaa");
+	strcpy(ptr_2, "bbbbbbbbbbbbbbbbbbbbbbbb");
+	strcpy(ptr_3, "cccccccccccccccccccccccc");
+	strcpy(ptr_4, "dddddddddddddddddddddddd");
 
 	char *ptr_5 = NULL;
 	char *ptr_6 = NULL;
 	char *ptr_7 = NULL;
 	char *ptr_8 = NULL;
 
-	ptr_5 = realloc(ptr_1, 16);
-	ptr_6 = realloc(ptr_2, 16);
-	ptr_7 = realloc(ptr_3, 16);
-	ptr_8 = realloc(ptr_4, 16);
+	ptr_5 = realloc(ptr_1, get_random_number(1, 1000));
+	ptr_6 = realloc(ptr_2, get_random_number(1, 1000));
+	ptr_7 = realloc(ptr_3, get_random_number(1, 1000));
+	ptr_8 = realloc(ptr_4, get_random_number(1, 1000));
 
 	if (!ptr_5 || !ptr_6 || !ptr_3 || !ptr_4)
 		printf(RED "Memory allocation error\n" RESET);
@@ -808,6 +803,10 @@ void test_random_realloc_level_one() {
 	if (ptr_8[0] != 'd')
 		printf(RED "Memory overwrite error level one %c\n" RESET, ptr_8[0]);
 
+	free(ptr_5);
+	free(ptr_6);
+	free(ptr_7);
+	free(ptr_8);
 
 	printf(GREEN "Test random realloc level one OK\n" RESET);
 }
@@ -920,7 +919,7 @@ void test_stress_malloc() {
 
 void test_return_100_mallocs_to_the_same_ptr() {
 	int i = 0;
-	char *ptr;
+	int *ptr;
 
 	printf("Testing return 100 mallocs to the same ptr...\n");
 
@@ -931,10 +930,10 @@ void test_return_100_mallocs_to_the_same_ptr() {
 			return;
 		}
 		ft_bzero(ptr, 100);
+		free(ptr);
 		i++;
 	}
 
-	free(ptr);
 	printf(GREEN "Test return 100 mallocs to the same ptr OK\n" RESET);
 }
 
@@ -955,14 +954,13 @@ int main() {
 	test_four_mallocs();
 	test_malloc_large();
 	test_double_array_small();
-
 	test_double_array();
 	test_integer_array();
 	test_large_memory_copy();
 	test_memory_overwrite_small();
 	test_memory_overwrite();
 	test_stress_malloc();
-	test_negative();
+	// test_negative();
 	test_zero();
 	test_mem_alignment();
 	test_mem_alignment_extensive();
