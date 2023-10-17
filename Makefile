@@ -39,7 +39,7 @@ clean:
 	$(RM) $(OBJ)
 
 test: $(TEST_SRC) $(NAME) $(HEADER)
-	$(CC) $(CFLAGS)  -g3 -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
+	$(CC) $(CFLAGS)  -DHOSTTYPE="$(HOSTTYPE)" -g3 -o ./test $(TEST_SRC) -I $(INCLUDE)  -I libft  -L libft -lft -L . -lmalloc
 
 
 time: test_malloc test_system_malloc
@@ -75,8 +75,6 @@ re: fclean all
 v: valgrind
 
 valgrind: $(NAME) test
-	LD_LIBRARY_PATH=. valgrind ./test
-
-
+	LD_LIBRARY_PATH=. valgrind --leak-check=full ./test
 
 .PHONY: all clean fclean re time x test_system_malloc unit debug valgrind
